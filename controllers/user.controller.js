@@ -46,8 +46,9 @@ export const verifiy =catchAsncError(async(req,res,next)=>{
             next(new AppError('Token is invalid'+err,401));
         }
         else{
-        await userModel.findOneAndUpdate({email:decoded.options},{confirmEmail:true})
-        res.connection.destroy();
+        await userModel.findOneAndUpdate({email:decoded.options},{confirmEmail:true});
+        res.send("Done")
+        // res.connection.destroy();
         }
     });
     
