@@ -47,7 +47,7 @@ export const verifiy =catchAsncError(async(req,res,next)=>{
         }
         else{
         await userModel.findOneAndUpdate({email:decoded.options},{confirmEmail:true})
-        next(new AppError("Done",200))
+        res.connection.destroy();
         }
     });
     
