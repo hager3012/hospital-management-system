@@ -308,7 +308,7 @@ header, .logo{
                 <p class="p-font">Hey ${email}, you're almost ready to start enjoying <b>HMS</b>.  
                 Simply click the BIG yellow button below to verify your email address.</p>
                 <div class="wrapper">
-                    <a class="button" href="http://localhost:8080/user/verify/${token}">Verify email address</a>
+                    <a class="button" href="https://hms-x2rp.onrender.com/user/verify/${token}">Verify email address</a>
                 </div>
 
                 <!-- Filter: https://css-tricks.com/gooey-effect/ -->
