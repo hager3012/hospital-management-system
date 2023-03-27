@@ -14,11 +14,6 @@ export const SingnUp= catchAsncError(async(req,res,next)=>{
     if(!Email){ 
         _hash(password, Number(process.env.ROUND), async function(err, hash) {
             // Store hash in your password DB.
-            if(Gender){
-                Gender='female'
-            }else{
-                Gender='mele'
-            }
             await userModel.insertMany({name,email,password:hash,role,Mobile,Gender,DOB,Address});
             _sendMail(email);
             next(new AppError("Done",200)); 
@@ -35,6 +30,8 @@ export const SingnIn= catchAsncError(async(req,res,next)=>{
     let user=await userModel.findOne({email:email});
     if(!user||!await compare(password, user.password))
         return next(new AppError('incorrect in email or password',401))
+    if(!user.confirmEmail)    
+        return next(new AppError('this user not confirm',401))
     let token=_generateSingin({name:user.name,role:user.role,id:user._id})
     req.Token=token
     next(new AppError("Done",200));

@@ -5,6 +5,7 @@ import express, { json } from 'express';
 import helmet from 'helmet';
 import { DBConnect } from './database/dbConnection.js';
 import   userRouter  from './router/user.router.js';
+import AdminRouter from './router/Admin.router.js';
 import { AppError } from './util/AppError.js';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
@@ -23,6 +24,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(json());
 app.use(express.static('uploads'));
 app.use('/user',userRouter);
+app.use('/Admin',AdminRouter);
 app.all('*',(req,res,next)=>{
     next(new AppError("invalid url - can’t access this endPoind"+req.originalUrl,404))
 })
