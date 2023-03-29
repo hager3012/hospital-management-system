@@ -10,7 +10,6 @@ import { AppError } from './../util/AppError.js';
 export const SingnUp= catchAsncError(async(req,res,next)=>{
     let {name,email,password,role,Mobile,Gender,DOB,Address}=req.body;
     let Email=await userModel.findOne({email:email});
-    console.log(req.body);
     if(!Email){ 
         _hash(password, Number(process.env.ROUND), async function(err, hash) {
             // Store hash in your password DB.

@@ -7,7 +7,7 @@ export const validation=(Schema)=>{
             next();
         }
         else{
-            next(new AppError(error.details,500))
+            next(new AppError(`${error}`,500))
         }
     }
 }
