@@ -7,7 +7,7 @@ export const signUpValidate=joi.object({
     Mobile:joi.string().pattern(new RegExp('^01[0-2,5]{1}[0-9]{8}$')).required(),
     Gender:joi.string().required(),
     DOB:joi.string().pattern(new RegExp('^[1-9][0-9]{3}-[1-9][0-9]-[0-9]{1,2}$')).required(),
-    Address:joi.string().pattern(new RegExp('^[a-z A-Z 0-9]{5,100}$')).required(),
+    Address:joi.string().required(),
     role:joi.string()
 });
 //////////////////////////////////////

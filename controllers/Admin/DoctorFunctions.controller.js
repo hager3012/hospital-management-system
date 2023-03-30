@@ -1,9 +1,9 @@
-import {Doctor} from '../models/Doctors.models.js'
-import { userModel } from '../models/user.model.js';
-import { catchAsncError } from "../util/catchAsncError.js";
-import { AppError } from './../util/AppError.js';
-import { hash as _hash, compare } from 'bcrypt';
-import { sendMail as _sendMail } from '../emails/HMS.email.js';
+import { hash as _hash } from 'bcrypt';
+import { sendMail as _sendMail } from '../../emails/HMS.email.js';
+import { Doctor } from '../../models/Doctors.models.js';
+import { userModel } from '../../models/user.model.js';
+import { catchAsncError } from '../../util/catchAsncError.js';
+import { AppError } from '../../util/AppError.js';
 export const addDoctor=catchAsncError(async(req,res,next)=>{
   const {name,email,password,Mobile,Gender,DOB,Address,Specialization,Experience,Language,role}=req.body;
   let Email=await userModel.findOne({email:email});
@@ -54,11 +54,12 @@ export const DeleteDoctor= catchAsncError(async(req,res,next)=>{
   const {id}=req.params;
   const doctor=await Doctor.findById(id);
   if(doctor){
-    let deleteDoctor=await Doctor.findByIdAndDelete({_id:id},{new:true}).populate('userId','-_id -confirmEmail -role -password -__v')
-    let deleteUser=await userModel.findByIdAndDelete({_id:deleteDoctor.userId},{new:true})
+    let deleteDoctor=await Doctor.findByIdAndDelete({_id:id},{new:true}).populate('userId',' -confirmEmail -role -password -__v');
+    let deleteUser=await userModel.deleteOne({_id:deleteDoctor.userId},{new:true})
     if(deleteDoctor&&deleteUser){
       res.json({message:deleteDoctor,status:200}) ;
     }
+    
   }
   
   else{
