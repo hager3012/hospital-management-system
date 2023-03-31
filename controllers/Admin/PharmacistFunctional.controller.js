@@ -48,7 +48,7 @@ export const UpdatePharmacist= catchAsncError(async(req,res,next)=>{
     res.json({message:'Done',pharmacist:pharmacists,status:200});
   }
   else{
-    next(new AppError('Doctor is Not Found',422))
+    next(new AppError('Pharmacist is Not Found',422))
   }
   })
 // /////////////////////////////////////////////// 
@@ -56,15 +56,15 @@ export const DeletePharmacist= catchAsncError(async(req,res,next)=>{
   const {id}=req.params;
   const pharmacists=await pharmacist.findById(id);
   if(pharmacists){
-    let deleteDoctor=await pharmacist.findByIdAndDelete({_id:id},{new:true}).populate('userId',' -confirmEmail -role -password -__v');
+    let deletepharmacists=await pharmacist.findByIdAndDelete({_id:id},{new:true}).populate('userId',' -confirmEmail -role -password -__v');
     let deleteUser=await userModel.deleteOne({_id:deleteDoctor.userId},{new:true})
-    if(deleteDoctor&&deleteUser){
-      res.json({message:deleteDoctor,status:200}) ;
+    if(deletepharmacists&&deleteUser){
+      res.json({message:deletepharmacists,status:200}) ;
     }
     
   }
   
   else{
-    next(new AppError('Doctor is Not Found',422))
+    next(new AppError('Pharmacist is Not Found',422))
   }
 })
