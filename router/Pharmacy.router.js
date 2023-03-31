@@ -1,14 +1,9 @@
 import { Router } from 'express';
 import { auth as _auth } from '../Middleware/user.auth.js';
-import { author } from './../Middleware/Admin.author.js';
-import { DeletePharmacist, UpdatePharmacist, addPharmacist, findAll, findOne } from '../controllers/Admin/PharmacistFunctional.controller.js';
+import {  authorPharmacy } from './../Middleware/author.js';
 import { validation } from './../Middleware/validation.js';
-import { AddPharmacyValidate } from '../validation/Admin.validation.js';
-import { UpdatePharmacyValidate } from './../validation/Admin.validation.js';
+import { AddMedicineValidate } from '../validation/pharmacy.validation.js';
+import { addMedicine } from '../controllers/Pharmacy/Medicine.controller.js';
 const PharmacyRouter =Router();
-PharmacyRouter.post('/AddPharmacist',_auth,validation(AddPharmacyValidate),author,addPharmacist);
-PharmacyRouter.get('/findAll',_auth,author,findAll);
-PharmacyRouter.get('/findOnePharmacist/:id',_auth,author,findOne);
-PharmacyRouter.put('/updatePharmacist/:id',_auth,validation(UpdatePharmacyValidate),author,UpdatePharmacist);
-PharmacyRouter.delete('/Delete/:id',_auth,author,DeletePharmacist);
+PharmacyRouter.post('/AddMedicine',_auth,validation(AddMedicineValidate),authorPharmacy,addMedicine)
 export default PharmacyRouter;   

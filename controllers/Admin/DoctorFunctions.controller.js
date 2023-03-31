@@ -1,6 +1,6 @@
 import { hash as _hash } from 'bcrypt';
 import { sendMail as _sendMail } from '../../emails/HMS.email.js';
-import { Doctor } from '../../models/Doctors.models.js';
+import { Doctor } from '../../models/Doctors/Doctors.models.js';
 import { userModel } from '../../models/user.model.js';
 import { catchAsncError } from '../../util/catchAsncError.js';
 import { AppError } from '../../util/AppError.js';
@@ -13,7 +13,7 @@ export const addDoctor=catchAsncError(async(req,res,next)=>{
       const {_id}=await userModel.findOne({email})
       await Doctor.insertMany({Specialization,Experience,Language,userId:_id})
       _sendMail(email,role,password); 
-      next(new AppError("Done",200)); 
+      next(new AppError("success",200)); 
     }) 
   }
   else{
@@ -24,13 +24,13 @@ export const addDoctor=catchAsncError(async(req,res,next)=>{
 ////////////////////////////////////////
 export const findAll=catchAsncError( async(req,res,next)=> {
   let Doctors=  await Doctor.find({},{Language:0,__v:0,createdAt:0,updatedAt:0}).populate('userId','name -_id');
-  res.json({Doctors:Doctors,status:200})
+  res.json({message:'success',Doctors:Doctors,status:200})
     })
 // ///////////////////////////////////////
 export const  findOne=catchAsncError( async(req,res,next)=>{
   let {id}=req.params;
   let Doctors=await Doctor.findById(id,{__v:0}).populate('userId','-_id -confirmEmail -role -password -__v')
-  res.json({Doctor:Doctors,status:200});
+  res.json({message:'success',Doctor:Doctors,status:200});
 })
 // //////////////////////////////////////
 export const UpdateDoctor= catchAsncError(async(req,res,next)=>{
@@ -43,7 +43,7 @@ export const UpdateDoctor= catchAsncError(async(req,res,next)=>{
     let doctor= await Doctor.findByIdAndUpdate(id,{Specialization,Experience,Language,userId:findDoctor.userId},{new:true}).populate('userId','-_id -confirmEmail -role -password -__v')
 
 
-    res.json({message:'Done',Doctor:doctor,status:200});
+    res.json({message:'success',Doctor:doctor,status:200});
   }
   else{
     next(new AppError('Doctor is Not Found',422))
@@ -57,7 +57,7 @@ export const DeleteDoctor= catchAsncError(async(req,res,next)=>{
     let deleteDoctor=await Doctor.findByIdAndDelete({_id:id},{new:true}).populate('userId',' -confirmEmail -role -password -__v');
     let deleteUser=await userModel.deleteOne({_id:deleteDoctor.userId},{new:true})
     if(deleteDoctor&&deleteUser){
-      res.json({message:deleteDoctor,status:200}) ;
+      res.json({message:'success',Doctor:deleteDoctor,status:200}) ;
     }
     
   }
