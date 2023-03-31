@@ -30,7 +30,12 @@ export const findAll=catchAsncError( async(req,res,next)=> {
 export const  findOne=catchAsncError( async(req,res,next)=>{
   let {id}=req.params;
   let Doctors=await Doctor.findById(id,{__v:0}).populate('userId','-_id -confirmEmail -role -password -__v')
-  res.json({message:'success',Doctor:Doctors,status:200});
+  if(Doctors!=null){
+    res.json({message:'success',Doctor:Doctors,status:200});
+  }else{
+    next(new AppError('Doctor Not Found',422))
+  }
+
 })
 // //////////////////////////////////////
 export const UpdateDoctor= catchAsncError(async(req,res,next)=>{

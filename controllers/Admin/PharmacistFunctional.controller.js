@@ -32,7 +32,12 @@ export const findAllPharmacist=catchAsncError( async(req,res,next)=> {
 export const  findOnePharmacist=catchAsncError( async(req,res,next)=>{
   let {id}=req.params;
   let pharmacists=await pharmacist.findById(id,{__v:0}).populate('userId','-_id -confirmEmail -role -password -__v').populate('PharmacyId','-_id')
-  res.json({message:'success',pharmacist:pharmacists,status:200});
+  if(pharmacists!=null){
+    res.json({message:'success',pharmacist:pharmacists,status:200});
+  }else{
+    next(new AppError('Pharmacist Not Found',422))
+  }
+
 })
 // //////////////////////////////////////
 export const UpdatePharmacist= catchAsncError(async(req,res,next)=>{
