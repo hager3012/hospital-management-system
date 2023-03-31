@@ -57,7 +57,7 @@ export const DeletePharmacist= catchAsncError(async(req,res,next)=>{
   const pharmacists=await pharmacist.findById(id);
   if(pharmacists){
     let deletepharmacists=await pharmacist.findByIdAndDelete({_id:id},{new:true}).populate('userId',' -confirmEmail -role -password -__v');
-    let deleteUser=await userModel.deleteOne({_id:deleteDoctor.userId},{new:true})
+    let deleteUser=await userModel.deleteOne({_id:deletepharmacists.userId},{new:true})
     if(deletepharmacists&&deleteUser){
       res.json({message:deletepharmacists,status:200}) ;
     }
