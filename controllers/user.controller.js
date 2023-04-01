@@ -32,7 +32,7 @@ export const SingnIn= catchAsncError(async(req,res,next)=>{
         return res.json({Erorr:'this user not confirm',status:401});
     let token=_generateSingin({name:user.name,role:user.role,id:user._id})
     req.Token=token
-    res.json({message:'success',status:200});
+    res.json({message:'success',Token:token,status:200});
 })
 export const verifiy =catchAsncError(async(req,res,next)=>{
     let {token}=req.params;
