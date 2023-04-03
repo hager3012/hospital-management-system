@@ -19,7 +19,7 @@ export const addPharmacist=catchAsncError(async(req,res,next)=>{
     }) 
   }
   else{
-    next(new AppError('Email is alreay Found',422))
+    next(new AppError('Email Already in Use',422))
   }
   
 })

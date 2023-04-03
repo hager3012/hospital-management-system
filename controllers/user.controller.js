@@ -19,7 +19,7 @@ export const SingnUp= catchAsncError(async(req,res,next)=>{
     }
 
     else{
-        res.json({Error:'Email Already in Use',status:422})
+        next(new AppError('Email Already in Use',422))
     }
 
 })
@@ -27,9 +27,9 @@ export const SingnIn= catchAsncError(async(req,res,next)=>{
     const {email,password}=req.body;
     let user=await userModel.findOne({email:email});
     if(!user||!await compare(password, user.password))
-        return res.json({Erorr:'incorrect in email or password',status:401});
-    if(!user.confirmEmail)    
-        return res.json({Erorr:'this user not confirm',status:401});
+        return next(new AppError('incorrect in email or password',401))
+    if(!user.confirmEmail)
+        return next(new AppError('this user not confirm',401))     
     let token=_generateSingin({name:user.name,role:user.role,id:user._id})
     req.Token=token
     res.json({message:'success',Token:token,status:200});
@@ -38,7 +38,7 @@ export const verifiy =catchAsncError(async(req,res,next)=>{
     let {token}=req.params;
     jwt.verify(token, process.env.JWT_KEY,  async function(err, decoded) {
         if(err){
-            res.json({Error:'Token is invalid'+err,status:401});
+            next(new AppError('Token is invalid',401)) 
         }
         else{
         await userModel.findOneAndUpdate({email:decoded.options},{confirmEmail:true});
