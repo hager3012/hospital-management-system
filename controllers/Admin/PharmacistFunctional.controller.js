@@ -15,7 +15,7 @@ export const addPharmacist=catchAsncError(async(req,res,next)=>{
       let {id}=await Pharmacy.findOne({name:namePharmacy});
       await pharmacist.insertMany({userId:_id,PharmacyId:id})
       _sendMail(email,role,password); 
-      next(new AppError("success",200)); 
+      res.json({message:'success',status:200})
     }) 
   }
   else{

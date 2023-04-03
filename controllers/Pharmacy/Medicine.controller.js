@@ -9,7 +9,7 @@ export const addMedicine=catchAsncError(async(req,res,next)=>{
     if(!Medicines){
         let {id}=await Pharmacy.findOne({name:namePharmacy});
         await Medicine.insertMany({Medicine_name,Medicine_quantity,Medicine_type,Medicine_price,exp_date,Pharmacy:id});
-        next(new AppError("success",200)); 
+        res.json({message:'success',status:200})
     }
     else{
         next(new AppError('Medicine is alreay Found',422))

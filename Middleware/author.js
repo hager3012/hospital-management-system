@@ -4,7 +4,7 @@ export const authorAdmin=async(req,res,next)=>{
     let token=req.header('token');
     jwt.verify(token, process.env.JWT_KEY, async function(err, decoded) {
         if(err){
-            res.json({err,status:400})
+            next(new AppError(err,400))
         }
         else{
             let id=decoded.id;
@@ -12,7 +12,7 @@ export const authorAdmin=async(req,res,next)=>{
             if(role=="admin"){
                 next();
             }else{
-                res.json({Error:'Not authorized',status:403})
+                next(new AppError('Not authorized',403))
             }
             
         }
@@ -22,7 +22,7 @@ export const authorPharmacy=async(req,res,next)=>{
     let token=req.header('token');
     jwt.verify(token, process.env.JWT_KEY, async function(err, decoded) {
         if(err){
-            res.json({err,status:400})
+            next(new AppError(err,400))
         }
         else{
             let id=decoded.id;
@@ -30,7 +30,7 @@ export const authorPharmacy=async(req,res,next)=>{
             if(role=="pharmacist"){
                 next();
             }else{
-                res.json({Error:'Not authorized',status:403})
+                next(new AppError('Not authorized',403))
             }
             
         }

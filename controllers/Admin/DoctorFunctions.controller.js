@@ -13,7 +13,7 @@ export const addDoctor=catchAsncError(async(req,res,next)=>{
       const {_id}=await userModel.findOne({email})
       await Doctor.insertMany({Specialization,Experience,Language,userId:_id})
       _sendMail(email,role,password); 
-      next(new AppError("success",200)); 
+      res.json({message:'success',status:200})
     }) 
   }
   else{

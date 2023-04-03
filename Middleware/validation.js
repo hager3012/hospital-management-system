@@ -7,7 +7,7 @@ export const validation=(Schema)=>{
         }
         else{
             let Error=error.details[0].message
-            res.json({Error:Error,status:500})
+            next(new AppError(Error,400))
         }
     }
 }

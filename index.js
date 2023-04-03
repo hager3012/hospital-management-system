@@ -28,8 +28,13 @@ app.use('/user',userRouter);
 app.use('/Admin',AdminRouter);
 app.use(PharmacyRouter)
 app.all('*',(req,res,next)=>{
-    res.json({Error:"invalid url - can’t access this endPoind"+req.originalUrl,status:404})
+    next(new AppError("invalid url - can’t access this endPoind"+req.originalUrl,404))
 }) 
+app.use((Errors, req, res, next) => {
+    console.log(Errors);
+    let code= Errors.status||500
+    res.status(code).json({status:code,Error:Errors})
+  });
 DBConnect(); 
 app.listen(process.env.PORT);
 process.on('unhandledRejection',(err)=>{
