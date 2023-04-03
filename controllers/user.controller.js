@@ -6,6 +6,7 @@ import { userModel } from '../models/user.model.js';
 import { sendMail as _sendMail } from '../emails/user.email.js';
 import { catchAsncError } from "../util/catchAsncError.js";
 import  jwt  from 'jsonwebtoken';
+import { AppError } from '../util/AppError.js';
 export const SingnUp= catchAsncError(async(req,res,next)=>{
     let {name,email,password,role,Mobile,Gender,DOB,Address}=req.body;
     let Email=await userModel.findOne({email:email});
