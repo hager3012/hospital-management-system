@@ -22,7 +22,7 @@ export const signUpValidate=joi.object({
     'string.pattern.base': '"password" with value password must be at least 3 characters long contain a number and an uppercase letter  ',
     'string.empty': `"password" is not allowed to be empty`,
     'any.required': `"password" is a required field`,
-    'any.only': ' does not match' }),
+    'any.only': '"password" does not match' }),
     Mobile:joi.string().pattern(new RegExp('^01[0-2,5]{1}[0-9]{8}$')).required().messages({
         'string.base': '"Mobile" must be a string',
         'string.empty': '"Mobile" is not allowed to be empty',
