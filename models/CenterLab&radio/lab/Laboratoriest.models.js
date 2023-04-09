@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 const Schema =mongoose.Schema;
-const PharmacistSchema=new Schema({
+const LaboratoriestSchema=new Schema({
   userId:{
     type:mongoose.Types.ObjectId,
     ref:'user',
     required:true
   },
-  PharmacyId:{
+  Laboratory:{
     type:mongoose.Types.ObjectId,
-    ref:'Pharmacy',
+    ref:'Laboratory',
     required:true
   },
   Times:{
@@ -24,4 +24,4 @@ Salary:{
 },{
   timestamps:true
 })
-export const pharmacist=mongoose.model('pharmacist',PharmacistSchema);
+export const Laboratoriest=mongoose.model('Laboratoriest',LaboratoriestSchema);

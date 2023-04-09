@@ -16,7 +16,7 @@ const user=new Schema({
     },
     role:{
         type:String,
-        enum:['admin','user','doctor','pharmacist'],
+        enum:['admin','user','doctor','pharmacist','Laboratoriest','Radiologist','Accountant'],
         default:'user',
         required:true
     },

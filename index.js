@@ -26,7 +26,7 @@ app.use(json());
 app.use(express.static('uploads'));
 app.use('/user',userRouter);
 app.use('/Admin',AdminRouter);
-app.use(PharmacyRouter)
+app.use('/Pharmacy',PharmacyRouter)
 app.all('*',(req,res,next)=>{
     next(new AppError("invalid url - can’t access this endPoind"+req.originalUrl,404))
 }) 

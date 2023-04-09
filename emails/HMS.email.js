@@ -9,14 +9,14 @@ export async function sendMail(options,role,password) {
     let transporter = createTransport({
         service: 'gmail',
         auth: {
-            user: 'hagershaaban7@gmail.com',
-            pass: 'piuzrzeaegecmplz', // generated ethereal password
+            user: 'hmsytem65@gmail.com',
+            pass: 'gqvvhquecasoxvks', // generated ethereal password
         }, 
     });
     // let token =jwt.sign({options},process.env.JWT_KEY) 
     let token=generateSingin({options})
     let info = await transporter.sendMail({
-        from: '"HMS" <hagershaaban7@gmail.com>',
+        from: '"HMS" <hmsytem65@gmail.com>',
         to: options,
         subject: "[HMS] Please verify your Email ",
         html: userEamilHTML(options,token,role,password)

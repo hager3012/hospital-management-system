@@ -17,7 +17,17 @@ const DoctorSchema=new Schema({
     type:mongoose.Types.ObjectId,
     ref:'user',
     required:true
-  }
+  },
+  Times:{
+  type:mongoose.Types.ObjectId,
+  ref:'Timing',
+  required:true
+},
+Salary:{
+  type:mongoose.Types.ObjectId,
+  ref:'Payment',
+  required:true
+}
 },{
   timestamps:true
 })
