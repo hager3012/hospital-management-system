@@ -46,3 +46,4 @@ AdminRouter.get('/findOneAccountant/:id',_auth,authorAdmin,findOneAccountant);
 AdminRouter.put('/UpdateAccountant/:id',_auth,validation(Accountant),authorAdmin,UpdateAccountant);
 AdminRouter.delete('/DeleteAccountant/:id/:currentPage',_auth,authorAdmin,DeleteAccountant);
 export default AdminRouter;
+//file
