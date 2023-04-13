@@ -2,13 +2,14 @@ import { Router } from 'express';
 import {  addDoctor, DeleteDoctor, findAll, findOne ,UpdateDoctor} from '../controllers/Admin/DoctorFunctions.controller.js';
 import { auth as _auth } from '../Middleware/user.auth.js';
 import { validation } from './../Middleware/validation.js';
-import { Accountant, AddDoctorValidate, AddEmployeeValidate, AddLaboratoriestValidate, AddPharmacyValidate, AddRadiologistValidate, UpdatePharmacyValidate } from './../validation/Admin.validation.js';
+import { Accountant, AddDoctorValidate, AddEmployeeValidate, AddLaboratoriestValidate, AddPharmacyValidate, AddRadiologistValidate, NurseValidate, UpdateNurseValidate, UpdatePharmacyValidate } from './../validation/Admin.validation.js';
 import { authorAdmin } from './../Middleware/author.js';
 import { addPharmacist, DeletePharmacist, findAllPharmacist, findOnePharmacist, UpdatePharmacist } from '../controllers/Admin/PharmacistFunctional.controller.js';
 import { addLaboratoriest, DeleteLaboratoriest, findAllLaboratoriest, findOneLaboratoriest, UpdateLaboratoriest } from '../controllers/Admin/LaboratoriestFunctional.controller.js';
 import { addRadiologist, DeleteRadiologist, findAllRadiologist, findOneRadiologist, UpdateRadiologist } from '../controllers/Admin/radiologistFunctional.controller.js';
 import { addEmployee, DeleteEmployee, findAllEmployee, findOneEmployee, UpdateEmployee } from '../controllers/Admin/EmployeeFunctional.controll.js';
 import { addAccountant, DeleteAccountant, findAllAccountant, findOneAccountant, UpdateAccountant } from '../controllers/Admin/AccountantFunctional.controller.js';
+import { addNurse, DeleteNurse, findAllNurse, findOneNurse, UpdateNurse } from '../controllers/Admin/NurseFunctional.controllers.js';
 const AdminRouter =Router();
 AdminRouter.post('/AddDoctor',_auth,validation(AddDoctorValidate),authorAdmin,addDoctor);
 AdminRouter.get('/findAll/:currentPage',_auth,authorAdmin,findAll);
@@ -45,5 +46,10 @@ AdminRouter.get('/findAllAccountant/:currentPage',_auth,authorAdmin,findAllAccou
 AdminRouter.get('/findOneAccountant/:id',_auth,authorAdmin,findOneAccountant);
 AdminRouter.put('/UpdateAccountant/:id',_auth,validation(Accountant),authorAdmin,UpdateAccountant);
 AdminRouter.delete('/DeleteAccountant/:id/:currentPage',_auth,authorAdmin,DeleteAccountant);
+/////////////////////////////////////////////
+AdminRouter.post('/addNurse',_auth,validation(NurseValidate),authorAdmin,addNurse);
+AdminRouter.get('/findAllNurse/:currentPage',_auth,authorAdmin,findAllNurse);
+AdminRouter.get('/findOneNurse/:id',_auth,authorAdmin,findOneNurse);
+AdminRouter.put('/UpdateNurse/:id',_auth,validation(UpdateNurseValidate),authorAdmin,UpdateNurse);
+AdminRouter.delete('/DeleteNurse/:id/:currentPage',_auth,authorAdmin,DeleteNurse);
 export default AdminRouter;
-//file

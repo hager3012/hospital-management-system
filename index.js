@@ -10,6 +10,7 @@ import { AppError } from './util/AppError.js';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import PharmacyRouter from './router/Pharmacy.router.js';
+import DoctorRouter from './router/Doctor.router.js';
 dotenv.config();
 const app=express();
 app.use(helmet());
@@ -26,13 +27,14 @@ app.use(json());
 app.use(express.static('uploads'));
 app.use('/user',userRouter);
 app.use('/Admin',AdminRouter);
-app.use('/Pharmacy',PharmacyRouter)
+app.use('/Pharmacy',PharmacyRouter);
+app.use('/Doctor',DoctorRouter)
 app.all('*',(req,res,next)=>{
     next(new AppError("invalid url - can’t access this endPoind"+req.originalUrl,404))
 }) 
 app.use((Errors, req, res, next) => {
     console.log(Errors);
-    let code= Errors.status||500
+    let code= Errors.statusCode||500
     res.status(code).json({status:code,Error:Errors.message})
   });
 DBConnect(); 
