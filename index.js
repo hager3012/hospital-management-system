@@ -3,6 +3,7 @@ process.on('uncaughtException',(err)=>{
 })
 import express, { json } from 'express';
 import helmet from 'helmet';
+import cors from 'cors'
 import { DBConnect } from './database/dbConnection.js';
 import   userRouter  from './router/user.router.js';
 import AdminRouter from './router/Admin.router.js';
@@ -14,6 +15,7 @@ import DoctorRouter from './router/Doctor.router.js';
 dotenv.config();
 const app=express();
 app.use(helmet());
+app.use(cors());
 app.use((req,res,next)=>{
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
