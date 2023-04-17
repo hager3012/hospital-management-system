@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 const Schema =mongoose.Schema;
 const TimingSchema=new Schema({
         Days:[],
-        Time:{
-        },
+        Time:[],
         confirmTiming:{
           type:String,
           default:-1

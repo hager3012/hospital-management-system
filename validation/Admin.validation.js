@@ -13,7 +13,7 @@ export const AddDoctorValidate=joi.object({
     Language:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(),
+    Time:joi.array().required(),
     role:joi.string().required()
 });
 export const AddPharmacyValidate=joi.object({
@@ -28,7 +28,7 @@ export const AddPharmacyValidate=joi.object({
     namePharmacy:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(),
+    Time:joi.array().required(),
     role:joi.string().required()
 });
 export const AddLaboratoriestValidate=joi.object({
@@ -43,7 +43,7 @@ export const AddLaboratoriestValidate=joi.object({
     nameLaboratory:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(),
+    Time:joi.array().required(),
     role:joi.string().required()
 });
 export const AddRadiologistValidate=joi.object({
@@ -58,7 +58,7 @@ export const AddRadiologistValidate=joi.object({
     nameX_RayCenter:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(),
+    Time:joi.array().required(),
     role:joi.string().required()
 });
 export const UpdatePharmacyValidate=joi.object({
@@ -69,7 +69,7 @@ export const UpdatePharmacyValidate=joi.object({
     Address:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(), 
+    Time:joi.array().required(), 
 });
 export const AddEmployeeValidate=joi.object({
     name:joi.string().required().min(3).max(20),
@@ -79,7 +79,7 @@ export const AddEmployeeValidate=joi.object({
     Address:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(),
+    Time:joi.array().required(),
     role:joi.string().required()
 });
 export const Accountant=joi.object({
@@ -93,7 +93,7 @@ export const Accountant=joi.object({
     Address:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(),
+    Time:joi.array().required(),
     role:joi.string().required()
 });
 export const NurseValidate=joi.object({
@@ -108,7 +108,7 @@ export const NurseValidate=joi.object({
     Specialization:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(),
+    Time:joi.array().required(),
     role:joi.string().required()
 });
 export const UpdateNurseValidate=joi.object({
@@ -119,5 +119,5 @@ export const UpdateNurseValidate=joi.object({
     Specialization:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
-    Time:joi.object().required(),
+    Time:joi.array().required(),
 });
