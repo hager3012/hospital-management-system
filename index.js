@@ -2,8 +2,8 @@ process.on('uncaughtException',(err)=>{
     console.log('error not in express'+err);
 })
 import express, { json } from 'express';
+import cors from 'cors';
 import helmet from 'helmet';
-import cors from 'cors'
 import { DBConnect } from './database/dbConnection.js';
 import   userRouter  from './router/user.router.js';
 import AdminRouter from './router/Admin.router.js';
@@ -12,6 +12,7 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import PharmacyRouter from './router/Pharmacy.router.js';
 import DoctorRouter from './router/Doctor.router.js';
+import PatientRouter from './router/Patient.router.js';
 dotenv.config();
 const app=express();
 app.use(helmet());
@@ -30,7 +31,8 @@ app.use(express.static('uploads'));
 app.use('/user',userRouter);
 app.use('/Admin',AdminRouter);
 app.use('/Pharmacy',PharmacyRouter);
-app.use('/Doctor',DoctorRouter)
+app.use('/Doctor',DoctorRouter) 
+app.use('/patient',PatientRouter) 
 app.all('*',(req,res,next)=>{
     next(new AppError("invalid url - can’t access this endPoind"+req.originalUrl,404))
 }) 

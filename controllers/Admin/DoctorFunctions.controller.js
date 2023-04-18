@@ -39,7 +39,7 @@ export const findAll=catchAsncError( async(req,res,next)=> {
   let Doctors=  await Doctor.find().countDocuments()
   .then(count => {
     totalDoctors = count;
-    return Doctor.find({},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email _id').populate({path:'Times',match: { confirmTiming:{$in:"false",$in:"-1"}   }})
+    return Doctor.find({},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email _id').populate('Times',' -__v -createdAt -updatedAt ')
       .skip((currentPage - 1) * perPage)
       .limit(perPage);
   });
@@ -105,4 +105,14 @@ export const DeleteDoctor= catchAsncError(async(req,res,next)=>{
   }else{
     next(new AppError('Doctor is Not Found',422))
   }
+})
+/////////////////////////////////////////////////////////////
+export const addTiming=catchAsncError(async(req,res,next)=>{
+  const {id,Days,Time}=req.body;
+    let idTime;
+      await Timing.insertMany({Days,Time}).then((data)=>{
+        idTime=data[0]._id;
+      })
+      await Doctor.updateOne({_id:id},{Times:idTime})
+      res.json({message:'success',status:200})
 })

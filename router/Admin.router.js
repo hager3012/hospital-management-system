@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import {  addDoctor, DeleteDoctor, findAll, findOne ,UpdateDoctor} from '../controllers/Admin/DoctorFunctions.controller.js';
+import {  addDoctor, addTiming, DeleteDoctor, findAll, findOne ,UpdateDoctor} from '../controllers/Admin/DoctorFunctions.controller.js';
 import { auth as _auth } from '../Middleware/user.auth.js';
 import { validation } from './../Middleware/validation.js';
-import { Accountant, AddDoctorValidate, AddEmployeeValidate, AddLaboratoriestValidate, AddPharmacyValidate, AddRadiologistValidate, NurseValidate, UpdateNurseValidate, UpdatePharmacyValidate } from './../validation/Admin.validation.js';
+import { Accountant, AddDoctorValidate, AddEmployeeValidate, AddLaboratoriestValidate, AddPharmacyValidate, AddRadiologistValidate, AddTimingValidate, NurseValidate, UpdateNurseValidate, UpdatePharmacyValidate } from './../validation/Admin.validation.js';
 import { authorAdmin } from './../Middleware/author.js';
 import { addPharmacist, DeletePharmacist, findAllPharmacist, findOnePharmacist, UpdatePharmacist } from '../controllers/Admin/PharmacistFunctional.controller.js';
 import { addLaboratoriest, DeleteLaboratoriest, findAllLaboratoriest, findOneLaboratoriest, UpdateLaboratoriest } from '../controllers/Admin/LaboratoriestFunctional.controller.js';
@@ -52,4 +52,6 @@ AdminRouter.get('/findAllNurse/:currentPage',_auth,authorAdmin,findAllNurse);
 AdminRouter.get('/findOneNurse/:id',_auth,authorAdmin,findOneNurse);
 AdminRouter.put('/UpdateNurse/:id',_auth,validation(UpdateNurseValidate),authorAdmin,UpdateNurse);
 AdminRouter.delete('/DeleteNurse/:id/:currentPage',_auth,authorAdmin,DeleteNurse);
+///////////////////////////////////////////
+AdminRouter.post('/AddTiming',_auth,validation(AddTimingValidate),authorAdmin,addTiming)
 export default AdminRouter;
