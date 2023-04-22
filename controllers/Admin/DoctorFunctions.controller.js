@@ -33,7 +33,7 @@ export const addDoctor=catchAsncError(async(req,res,next)=>{
 })
 ////////////////////////////////////////
 export const findAll=catchAsncError( async(req,res,next)=> {
-  const {currentPage} = req.params || 1;
+  let currentPage = req.query.currentPage || 1;
   const perPage = 10;
   let totalDoctors;
   let Doctors=  await Doctor.find().countDocuments()
@@ -47,7 +47,7 @@ export const findAll=catchAsncError( async(req,res,next)=> {
     })
 // ///////////////////////////////////////
 export const  findOne=catchAsncError( async(req,res,next)=>{
-  let {id}=req.params;
+  let id=req.query.DoctorID;
   let Doctors=await Doctor.findById(id,{__v:0}).populate('userId',' -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
     'Salary','-user -__v -createdAt -updatedAt -_id'
   )
@@ -61,7 +61,7 @@ export const  findOne=catchAsncError( async(req,res,next)=>{
 })
 // //////////////////////////////////////
 export const UpdateDoctor= catchAsncError(async(req,res,next)=>{
-  const {id}=req.params;
+  const id=req.query.DoctorID;
   const {name,email,password,Mobile,Gender,DOB,Address,Specialization,Experience,Language,Days,Time,salary,role}=req.body;
   // this new for find after update without new return before update
   const findDoctor=await Doctor.findById(id);
@@ -81,7 +81,9 @@ export const UpdateDoctor= catchAsncError(async(req,res,next)=>{
   })
 // /////////////////////////////////////////////// 
 export const DeleteDoctor= catchAsncError(async(req,res,next)=>{
-  const {currentPage,id}=req.params;
+  let id=req.query.DoctorID;
+  let currentPage=req.query.currentPage;
+  console.log(id,currentPage);
   let DoctorOne=await Doctor.findById(id).populate('userId',' -confirmEmail -role -password -__v');
   if(DoctorOne){
     await Doctor.deleteOne({_id:id},{new:true}).populate('userId');

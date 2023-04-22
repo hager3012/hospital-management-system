@@ -12,10 +12,10 @@ import { addAccountant, DeleteAccountant, findAllAccountant, findOneAccountant, 
 import { addNurse, DeleteNurse, findAllNurse, findOneNurse, UpdateNurse } from '../controllers/Admin/NurseFunctional.controllers.js';
 const AdminRouter =Router();
 AdminRouter.post('/AddDoctor',_auth,validation(AddDoctorValidate),authorAdmin,addDoctor);
-AdminRouter.get('/findAll/:currentPage',_auth,authorAdmin,findAll);
-AdminRouter.get('/findOneDoctor/:id',_auth,authorAdmin,findOne);
-AdminRouter.put('/updateDoctor/:id',_auth,validation(AddDoctorValidate),authorAdmin,UpdateDoctor);
-AdminRouter.delete('/DeleteDoctor/:id/:currentPage',_auth,authorAdmin,DeleteDoctor);
+AdminRouter.get('/findAll',_auth,authorAdmin,findAll);
+AdminRouter.get('/findOneDoctor',_auth,authorAdmin,findOne);
+AdminRouter.put('/updateDoctor',_auth,validation(AddDoctorValidate),authorAdmin,UpdateDoctor);
+AdminRouter.delete('/DeleteDoctor',_auth,authorAdmin,DeleteDoctor);
 //////////////////////////////////////////
 AdminRouter.post('/AddPharmacist',_auth,validation(AddPharmacyValidate),authorAdmin,addPharmacist);
 AdminRouter.get('/findAllPharmacist/:currentPage',_auth,authorAdmin,findAllPharmacist);
