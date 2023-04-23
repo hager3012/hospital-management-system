@@ -7,13 +7,18 @@ import { sendMail as _sendMail } from '../emails/user.email.js';
 import { catchAsncError } from "../util/catchAsncError.js";
 import  jwt  from 'jsonwebtoken';
 import { AppError } from '../util/AppError.js';
+import { Patient } from '../models/Patient/Patient.models.js';
 export const SingnUp= catchAsncError(async(req,res,next)=>{
     let {name,email,password,role,Mobile,Gender,DOB,Address}=req.body;
     let Email=await userModel.findOne({email:email});
     if(!Email){ 
+        let userID;
         _hash(password, Number(process.env.ROUND), async function(err, hash) {
             // Store hash in your password DB.
-            await userModel.insertMany({name,email,password:hash,role,Mobile,Gender,DOB,Address});
+            await userModel.insertMany({name,email,password:hash,role,Mobile,Gender,DOB,Address}).then(response=>{
+                userID=response[0]._id;
+            });
+            await Patient.insertMany({user:userID});
             _sendMail(email);
             res.json({message:'success',status:200});
         });

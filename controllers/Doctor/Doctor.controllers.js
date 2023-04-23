@@ -35,12 +35,12 @@ export const addLimitRange =catchAsncError(async(req,res,next)=>{
     let {limitRange} = req.body;
     let DoctorFind=await Doctor.findOne({userId:DoctorId}).populate({path:'Times'})
         if(DoctorFind){
-            let book = await bookingTime.findOne({doctor:DoctorId})
+            let book = await bookingTime.findOne({doctor:DoctorFind._id})
             if(book){
-                await bookingTime.findOneAndUpdate({doctor:DoctorId},{limitRange})
+                await bookingTime.findOneAndUpdate({doctor:DoctorFind._id},{limitRange})
                 res.json({message:'success',status:200});
             }else{
-                await bookingTime.insertMany({doctor:DoctorId,numberOfPatients:0,Times:DoctorFind.Times._id,limitRange})
+                await bookingTime.insertMany({doctor:DoctorFind._id,Times:DoctorFind.Times._id,limitRange})
                 res.json({message:'success',status:200});
             }
                

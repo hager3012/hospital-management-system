@@ -6,10 +6,6 @@ const bookingTimeSchema=new Schema({
         ref:'Doctor',
         required:true
       },
-      numberOfPatients:{
-        type:Number,
-        required:true
-      },
       Times:{
         type:mongoose.Types.ObjectId,
         ref:'Timing',
