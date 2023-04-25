@@ -34,7 +34,7 @@ export const signUpValidate=joi.object({
         'string.empty': '"Gender" is not allowed to be empty',
         'any.required': `"Gender" is a required field`
     }),
-    DOB:joi.string().pattern(new RegExp('^[1-9][0-9]{3}-[1-9][0-9]-[0-9]{1,2}$')).required().messages({
+    DOB:joi.date().required().messages({
         'string.base': '"DOB" must be a string',
         'string.empty': '"DOB" is not allowed to be empty',
         'string.pattern.base': '"DOB" with value invalid format ',
