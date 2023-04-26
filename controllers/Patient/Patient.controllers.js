@@ -20,7 +20,7 @@ export const searchDoctor=catchAsncError( async(req,res,next)=> {
   let Doctors=  await await Doctor.find({confirmTiming:"true"}).countDocuments()
   .then(count => {
     totalDoctors = count;
-    return Doctor.find({confirmTiming:"true"},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email _id').populate({ path: 'Times', select: 'Days Time ' })
+    return Doctor.find({confirmTiming:"true"},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email Gender _id').populate({ path: 'Times', select: 'Days Time ' })
     .skip((currentPage - 1) * perPage)  
     .limit(perPage)
     .then((response)=>{
