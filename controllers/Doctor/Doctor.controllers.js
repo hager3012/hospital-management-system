@@ -10,9 +10,9 @@ import { Patient } from './../../models/Patient/Patient.models.js';
 export const confirmTiming =catchAsncError(async(req,res,next)=>{
     let DoctorId=req.query.userID;
     let{confirm}=req.body;
-    let DoctorFind=await Doctor.findOne({userId:DoctorId}).populate('Times')
-    if(DoctorFind.Times.confirmTiming==="-1"){
-        await Timing.updateOne({_id:DoctorFind.Times._id},{confirmTiming:confirm})
+    let DoctorFind=await Doctor.findOne({userId:DoctorId})
+    if(DoctorFind.confirmTiming==="-1"){ 
+        await Doctor.updateOne({userId:DoctorId},{confirmTiming:confirm})
         res.json({message:'success',status:200});
     }else{
         next(new AppError('confirmed',422))
@@ -21,7 +21,7 @@ export const confirmTiming =catchAsncError(async(req,res,next)=>{
 export const ViewTiming =catchAsncError(async(req,res,next)=>{
     let userID=req.query.userID;
     let DoctorFind=await Doctor.findOne({userId:userID}).populate({path:'Times'   }).then((response=>{
-        if(response.Times.confirmTiming=="true"||response.Times.confirmTiming=="-1"){
+        if(response.confirmTiming=="true"||response.confirmTiming=="-1"){
             res.json({message:'success',Time:response.Times,status:200});
         }
         else{

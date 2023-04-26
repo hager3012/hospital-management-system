@@ -23,6 +23,10 @@ const DoctorSchema=new Schema({
   ref:'Timing',
   required:true
 },
+confirmTiming:{
+  type:String,
+  default:-1
+},
 Salary:{
   type:mongoose.Types.ObjectId,
   ref:'Payment',
