@@ -8,7 +8,7 @@ import { catchAsncError } from "../../util/catchAsncError.js";
 
 export const ViewDoctors=catchAsncError( async(req,res,next)=> {
   let doctorWithTimeTrue=[];
-     await  Doctor.find({},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email').populate({path:'Times'  }).then((response=>{
+     await  Doctor.find({},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email Gender').populate({path:'Times'  }).then((response=>{
       for (let index = 0; index < response.length; index++) {
         if(response[index].Times.confirmTiming==="true"){
           doctorWithTimeTrue.push(response[index]);
@@ -46,12 +46,13 @@ export const ViewAppointment=catchAsncError( async(req,res,next)=> {
   res.json({message:'success',Doctor:doctor,Time:time,status:200})
   }) 
   export const addMedicalHistory=catchAsncError( async(req,res,next)=> {
-    // let userID=req.query.userID;
-    // let patient =await Patient.findOne({user:userID});
-    // if(!patient){
-    //   return next(new AppError('Patient is Not Found',422))
-    // }
-    // console.log(patient);
+    let userID=req.query.userID;
+    let {Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol}=req.body;
+    let patient =await Patient.findOne({user:userID});
+    if(!patient){
+      return next(new AppError('Patient is Not Found',422))
+    }
+    console.log(Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol);
     }) 
 export const timeDetails =catchAsncError(async(req,res,next)=>{
   let doctorID=req.query.doctorID;

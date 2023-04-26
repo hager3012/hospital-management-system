@@ -10,18 +10,23 @@ const medicalHistorySchema=new Schema({
         required:true
     },
     medication:{
+        type:{},
         required:true
     },
     allergies:{
+        type:{},
         required:true
     },
     tobacco:{
+        type:{},
         required:true
     },
     illegalDrugs:{
+        type:{},
         required:true
     },
     consumeAlcohol:{
+        type:String,
         required:true
     },
     Patient:{
