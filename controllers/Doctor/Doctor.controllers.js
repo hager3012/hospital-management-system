@@ -22,7 +22,7 @@ export const ViewTiming =catchAsncError(async(req,res,next)=>{
     let userID=req.query.userID;
     let DoctorFind=await Doctor.findOne({userId:userID}).populate({path:'Times'   }).then((response=>{
         if(response.confirmTiming=="true"||response.confirmTiming=="-1"){
-            res.json({message:'success',Time:response.Times,status:200});
+            res.json({message:'success',Time:response,status:200});
         }
         else{
             next(new AppError('Timing cancel',422))
