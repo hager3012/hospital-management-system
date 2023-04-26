@@ -101,7 +101,7 @@ export const DeleteDoctor= catchAsncError(async(req,res,next)=>{
   let deleteSalary=await Payment.deleteOne({_id:DoctorOne.Salary},{new:true});
   
   if(deleteDoctors&&deleteUser&&deleteTiming&&deleteSalary){
-      res.json({message:'success',Doctor:deleteDoctors,status:200,TotalDoctors: totalDoctors}) ;
+      res.json({message:'success',Doctors:deleteDoctors,status:200,TotalDoctors: totalDoctors}) ;
     }
     
   }else{

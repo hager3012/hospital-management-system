@@ -2,13 +2,21 @@ import { Doctor } from "../../models/Doctors/Doctors.models.js";
 import { bookingTime } from "../../models/Doctors/bookingTime.models.js";
 import { Patient } from "../../models/Patient/Patient.models.js";
 import { appointment } from "../../models/Patient/appointment.models.js";
+import { Timing } from "../../models/Timing/Timing.models.js";
 import { AppError } from "../../util/AppError.js";
 import { catchAsncError } from "../../util/catchAsncError.js";
 
 export const ViewDoctors=catchAsncError( async(req,res,next)=> {
-     let Doctors=await  Doctor.find({},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId').populate('Times',' -__v -createdAt -updatedAt ')
-    res.json({message:'success',Doctors:Doctors,status:200})
-      }) 
+  let doctorWithTimeTrue=[];
+     await  Doctor.find({},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email').populate({path:'Times'  }).then((response=>{
+      for (let index = 0; index < response.length; index++) {
+        if(response[index].Times.confirmTiming==="true"){
+          doctorWithTimeTrue.push(response[index]);
+        }
+      }
+  }))
+  res.json({message:'success',Doctors:doctorWithTimeTrue,status:200});
+      })
 export const BookDoctor=catchAsncError( async(req,res,next)=> {
     let {doctorID,userID}=req.query;
     let {date}=req.body;
@@ -27,3 +35,32 @@ export const BookDoctor=catchAsncError( async(req,res,next)=> {
       res.json({message:'success',status:200});
     }
 }) 
+export const ViewAppointment=catchAsncError( async(req,res,next)=> {
+  let userID=req.query.userID;
+  let patient =await Patient.findOne({user:userID});
+  if(!patient){
+    return next(new AppError('Patient is Not Found',422))
+  }
+  let time=await appointment.findOne({Patient:patient._id},{__v:0,createdAt:0,updatedAt:0,Patient:0})
+  let doctor=await Doctor.findById(time.Doctor,{Experience:0,Language:0,Times:0,Salary:0,__v:0,createdAt:0,updatedAt:0}).populate('userId','name Specialization -_id')
+  res.json({message:'success',Doctor:doctor,Time:time,status:200})
+  }) 
+  export const addMedicalHistory=catchAsncError( async(req,res,next)=> {
+    // let userID=req.query.userID;
+    // let patient =await Patient.findOne({user:userID});
+    // if(!patient){
+    //   return next(new AppError('Patient is Not Found',422))
+    // }
+    // console.log(patient);
+    }) 
+export const timeDetails =catchAsncError(async(req,res,next)=>{
+  let doctorID=req.query.doctorID;
+  let bookingtime=await bookingTime.findOne({doctor:doctorID})
+  await Timing.findById(bookingtime.Times).then(data=>{
+    if(data.confirmTiming=="true"){
+      res.json({message:'success',data,status:200})
+    }else{
+      return next(new AppError('No Time',422))
+    }
+  });
+})

@@ -1,9 +1,11 @@
 import { Doctor } from "../../models/Doctors/Doctors.models.js";
 import { bookingTime } from "../../models/Doctors/bookingTime.models.js";
+import { appointment } from "../../models/Patient/appointment.models.js";
 import { Timing } from "../../models/Timing/Timing.models.js";
 import { userModel } from "../../models/user.model.js";
 import { AppError } from "../../util/AppError.js";
 import { catchAsncError } from "../../util/catchAsncError.js";
+import { Patient } from './../../models/Patient/Patient.models.js';
 
 export const confirmTiming =catchAsncError(async(req,res,next)=>{
     let DoctorId=req.query.userID;
@@ -51,3 +53,19 @@ export const addLimitRange =catchAsncError(async(req,res,next)=>{
         }
 
 })
+export const ViewAppointment=catchAsncError( async(req,res,next)=> {
+    let userID=req.query.userID;
+    let Time=[];
+    let DoctorFind=await Doctor.findOne({userId:userID})
+    if(!DoctorFind){
+      return next(new AppError('Doctor is Not Found',422))
+    }
+    let time=await appointment.find({Doctor:DoctorFind._id},{__v:0,createdAt:0,updatedAt:0,Doctor:0}).then(async(data)=>{
+        for(let i=0;i<data.length;i++){
+            let patient=await Patient.findById(data[i].Patient,{__v:0,createdAt:0,updatedAt:0, _id:0}).populate('user','name DOB -_id');
+            Time.push({Appointment:data[i],Patient:patient.user});
+        }
+        
+    })
+    res.json({message:'success',Data:Time,status:200})
+    }) 
