@@ -110,11 +110,12 @@ export const DeleteDoctor= catchAsncError(async(req,res,next)=>{
 })
 /////////////////////////////////////////////////////////////
 export const addTiming=catchAsncError(async(req,res,next)=>{
-  const {id,Days,Time}=req.body;
+  let userID=req.query.userID;
+  const {Days,Time}=req.body;
     let idTime;
       await Timing.insertMany({Days,Time}).then((data)=>{
         idTime=data[0]._id;
       })
-      await Doctor.updateOne({_id:id},{Times:idTime})
+      await Doctor.updateOne({userId:userID},{Times:idTime})
       res.json({message:'success',status:200})
 })

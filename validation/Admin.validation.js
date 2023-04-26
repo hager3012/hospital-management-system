@@ -17,7 +17,6 @@ export const AddDoctorValidate=joi.object({
     role:joi.string().required()
 });
 export const AddTimingValidate=joi.object({
-    id:joi.string().required(),
     Days:joi.array().required(),
     Time:joi.array().required(),
 });
