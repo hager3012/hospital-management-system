@@ -20,7 +20,7 @@ export const confirmTiming =catchAsncError(async(req,res,next)=>{
 })
 export const ViewTiming =catchAsncError(async(req,res,next)=>{
     let userID=req.query.userID;
-    let DoctorFind=await Doctor.findOne({userId:userID}).populate({path:'Times'   }).then((response=>{
+    let DoctorFind=await Doctor.findOne({userId:userID},{confirmTiming:1}).populate({path:'Times'   }).then((response=>{
         if(response.confirmTiming=="true"||response.confirmTiming=="-1"){
             res.json({message:'success',Time:response,status:200});
         }
