@@ -5,7 +5,7 @@ import { BookDoctor, ViewAppointment, ViewDoctors, addMedicalHistory, searchDoct
 const PatientRouter =Router();
 PatientRouter.get('/ViewDoctors',_auth,authorPatient,ViewDoctors)
 PatientRouter.get('/searchDoctor',_auth,authorPatient,searchDoctor)
-PatientRouter.put('/BookDoctor',_auth,authorPatient,BookDoctor)
+PatientRouter.post('/BookDoctor',_auth,authorPatient,BookDoctor)
 PatientRouter.get('/ViewAppointment',_auth,authorPatient,ViewAppointment)
 PatientRouter.post('/addMedicalHistory',_auth,authorPatient,addMedicalHistory)
 PatientRouter.get('/timeDetails',_auth,authorPatient,timeDetails)
