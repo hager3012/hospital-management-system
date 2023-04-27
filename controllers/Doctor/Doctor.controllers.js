@@ -1,5 +1,6 @@
 import { Doctor } from "../../models/Doctors/Doctors.models.js";
 import { bookingTime } from "../../models/Doctors/bookingTime.models.js";
+import { prescription } from "../../models/Doctors/prescription.models.js";
 import { appointment } from "../../models/Patient/appointment.models.js";
 import { Timing } from "../../models/Timing/Timing.models.js";
 import { userModel } from "../../models/user.model.js";
@@ -69,3 +70,34 @@ export const ViewAppointment=catchAsncError( async(req,res,next)=> {
     })
     res.json({message:'success',Data:Time,status:200})
     }) 
+export const addPrescription=catchAsncError(async(req,res,next)=>{
+    let {userID,patientID}=req.query;
+    let {Advice,Medication,Lab,X_ray}=req.body;
+    let doctor=await Doctor.findOne({userId:userID});
+    let patient=await Patient.findById({_id:patientID});
+    if(!doctor&&!patient){
+        return next(new AppError('Doctor or Patient is Not Found',422))
+    }
+    await prescription.insertMany({doctor:userID,Patient:patientID,Advice,Medication,Lab,X_ray}).then(()=>{
+        res.json({message:'success',status:200})
+    })
+})    
+export const viewPrescription=catchAsncError(async(req,res,next)=>{
+    let {userID,patientID}=req.query;
+    await prescription.findOne({doctor:userID,Patient:patientID}).then((data)=>{
+        if(!data){
+            return next(new AppError('prescription is Not Found',422))
+        }
+        res.json({message:'success',data,status:200})
+    });
+})
+export const updatePrescription=catchAsncError(async(req,res,next)=>{
+    let {userID,patientID}=req.query;
+    let {Advice,Medication,Lab,X_ray}=req.body;
+    await prescription.findOneAndUpdate({doctor:userID,Patient:patientID},{Advice,Medication,Lab,X_ray},{new:true}).then((data)=>{
+        if(!data){
+            return next(new AppError('prescription is Not Found',422))
+        }
+        res.json({message:'success',data,status:200})
+    });
+})

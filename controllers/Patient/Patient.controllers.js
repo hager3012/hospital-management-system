@@ -1,5 +1,6 @@
 import { Doctor } from "../../models/Doctors/Doctors.models.js";
 import { bookingTime } from "../../models/Doctors/bookingTime.models.js";
+import { prescription } from "../../models/Doctors/prescription.models.js";
 import { Patient } from "../../models/Patient/Patient.models.js";
 import { appointment } from "../../models/Patient/appointment.models.js";
 import { medicalHistory } from "../../models/Patient/medicalHistory.models.js";
@@ -32,18 +33,19 @@ export const searchDoctor=catchAsncError( async(req,res,next)=> {
 export const BookDoctor=catchAsncError( async(req,res,next)=> {
     let {doctorID,userID}=req.query;
     let {date}=req.body;
+    let DateAPI=date.day+" "+date.selDate
   let findDoctor=await Doctor.findById(doctorID);
   if(!findDoctor){
     return next(new AppError('Doctor is Not Found',422))
   }
-  let num=await appointment.find({Doctor:doctorID,Date:date}).count();
+  let num=await appointment.find({Doctor:doctorID,Date:DateAPI}).count();
     let limit=await bookingTime.findOne({doctor:doctorID});
     if(num===limit.limitRange){
       next(new AppError('Limit Range Completed Please Book another Time',422))
     }
     else{
       let patient =await Patient.findOne({user:userID});
-      await appointment.insertMany({Patient:patient._id,Doctor:doctorID,Date:date});
+      await appointment.insertMany({Patient:patient._id,Doctor:doctorID,Date:DateAPI});
       res.json({message:'success',status:200});
     }
 }) 
@@ -105,4 +107,15 @@ export const updateMedicalHistory =catchAsncError(async(req,res,next)=>{
     }
     let data=await medicalHistory.findOneAndUpdate({Patient:patient._id},{Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol},{new:true});
       res.json({message:'success',data,status:200})
+})
+///////////////////////////////////////////////////
+export const viewPrescription=catchAsncError(async(req,res,next)=>{
+  let {userID}=req.query;
+  let patient=await Patient.findOne({user:userID});
+  await prescription.findOne({Patient:patient._id}).then((data)=>{
+      if(!data){
+          return next(new AppError('prescription is Not Found',422))
+      }
+      res.json({message:'success',data,status:200})
+  });
 })
