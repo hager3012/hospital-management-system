@@ -60,7 +60,7 @@ export const ViewAppointment=catchAsncError( async(req,res,next)=> {
     for(let i=0;i<data.length;i++){
       let result=await Doctor.findById(data[i].Doctor,{Experience:0,Language:0,Times:0,Salary:0,__v:0,createdAt:0,updatedAt:0}).populate('userId','name Specialization -_id');
       if(result){
-        doctor.push(result,data[i]);
+        doctor.push({user:result,Time:data[i]});
       }
 
     }
