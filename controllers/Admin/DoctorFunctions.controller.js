@@ -62,14 +62,13 @@ export const  findOne=catchAsncError( async(req,res,next)=>{
 // //////////////////////////////////////
 export const UpdateDoctor= catchAsncError(async(req,res,next)=>{
   const id=req.query.DoctorID;
-  const {name,email,password,Mobile,Gender,DOB,Address,Specialization,Experience,Language,Days,Time,salary,role}=req.body;
+  const {name,Mobile,Address,Specialization,Experience,salary}=req.body;
   // this new for find after update without new return before update
   const findDoctor=await Doctor.findById(id);
   if(findDoctor){
-    await Timing.updateMany({_id:findDoctor.Times},{Days,Time})
   await Payment.updateOne({_id:findDoctor.Salary},{Salary:salary})
-    await userModel.findByIdAndUpdate(findDoctor.userId,{name,email,password,Mobile,Gender,DOB,Address,role},{new:true})
-    let Doctors= await Doctor.findByIdAndUpdate(id,{Specialization,Experience,Language},{new:true}).populate('userId','-_id -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
+    await userModel.findByIdAndUpdate(findDoctor.userId,{name,Mobile,Address},{new:true})
+    let Doctors= await Doctor.findByIdAndUpdate(id,{Specialization,Experience},{new:true}).populate('userId','-_id -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
       'Salary','-user -__v -createdAt -updatedAt -_id'
     )
   
@@ -116,7 +115,7 @@ export const addTiming=catchAsncError(async(req,res,next)=>{
       await Timing.insertMany({Days,Time}).then((data)=>{
         idTime=data[0]._id;
       })
-      await Doctor.updateOne({_id:doctorID},{Times:idTime})
+      await Doctor.updateOne({_id:doctorID},{Times:idTime,confirmTiming:"-1"})
       res.json({message:'success',status:200})
       console.log(doctorID);
 })
