@@ -62,13 +62,13 @@ export const  findOneLaboratoriest=catchAsncError( async(req,res,next)=>{
 // //////////////////////////////////////
 export const UpdateLaboratoriest= catchAsncError(async(req,res,next)=>{
   const {id}=req.params;
-  const {name,email,password,Mobile,Gender,DOB,Address,nameLaboratory,Days,Time,salary,role}=req.body;
+  const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findLaboratoriest=await Laboratoriest.findById(id);
   if(findLaboratoriest){
     await Timing.updateMany({_id:findLaboratoriest.Times},{Days,Time})
   await Payment.updateOne({_id:findLaboratoriest.Salary},{Salary:salary})
-    await userModel.findByIdAndUpdate(findLaboratoriest.userId,{name,email,password,Mobile,Gender,DOB,Address,nameLaboratory,Days,Time,salary,role},{new:true})
+    await userModel.findByIdAndUpdate(findLaboratoriest.userId,{name,Mobile,Address,Days,Time,salary},{new:true})
     let Laboratoriests= await Laboratoriest.findByIdAndUpdate(id,{userId:findLaboratoriest.userId} ,{new:true}).populate('userId','-_id -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
       'Salary','-user -__v -createdAt -updatedAt -_id'
     )

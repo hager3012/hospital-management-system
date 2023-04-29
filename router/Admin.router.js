@@ -14,7 +14,7 @@ const AdminRouter =Router();
 AdminRouter.post('/AddDoctor',_auth,validation(AddDoctorValidate),authorAdmin,addDoctor);
 AdminRouter.get('/findAll',_auth,authorAdmin,findAll);
 AdminRouter.get('/findOneDoctor',_auth,authorAdmin,findOne);
-AdminRouter.put('/updateDoctor',_auth,validation(AddDoctorValidate),authorAdmin,UpdateDoctor);
+AdminRouter.put('/updateDoctor',_auth,authorAdmin,UpdateDoctor);
 AdminRouter.delete('/DeleteDoctor',_auth,authorAdmin,DeleteDoctor);
 //////////////////////////////////////////
 AdminRouter.post('/AddPharmacist',_auth,validation(AddPharmacyValidate),authorAdmin,addPharmacist);
@@ -38,13 +38,13 @@ AdminRouter.delete('/DeleteRadiologist/:id/:currentPage',_auth,authorAdmin,Delet
 AdminRouter.post('/addEmployee',_auth,validation(AddEmployeeValidate),authorAdmin,addEmployee);
 AdminRouter.get('/findAllEmployee/:currentPage',_auth,authorAdmin,findAllEmployee);
 AdminRouter.get('/findOneEmployee/:id',_auth,authorAdmin,findOneEmployee);
-AdminRouter.put('/UpdateEmployee/:id',_auth,validation(AddEmployeeValidate),authorAdmin,UpdateEmployee);
+AdminRouter.put('/UpdateEmployee/:id',_auth,authorAdmin,UpdateEmployee);
 AdminRouter.delete('/DeleteEmployee/:id/:currentPage',_auth,authorAdmin,DeleteEmployee);
 /////////////////////////////////////////////////////////////
 AdminRouter.post('/addAccountant',_auth,validation(Accountant),authorAdmin,addAccountant);
 AdminRouter.get('/findAllAccountant/:currentPage',_auth,authorAdmin,findAllAccountant);
 AdminRouter.get('/findOneAccountant/:id',_auth,authorAdmin,findOneAccountant);
-AdminRouter.put('/UpdateAccountant/:id',_auth,validation(Accountant),authorAdmin,UpdateAccountant);
+AdminRouter.put('/UpdateAccountant/:id',_auth,authorAdmin,UpdateAccountant);
 AdminRouter.delete('/DeleteAccountant/:id/:currentPage',_auth,authorAdmin,DeleteAccountant);
 /////////////////////////////////////////////
 AdminRouter.post('/addNurse',_auth,validation(NurseValidate),authorAdmin,addNurse);

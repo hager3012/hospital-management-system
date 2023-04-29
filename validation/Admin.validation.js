@@ -68,8 +68,6 @@ export const AddRadiologistValidate=joi.object({
 export const UpdatePharmacyValidate=joi.object({
     name:joi.string().required().min(3).max(20),
     Mobile:joi.string().pattern(new RegExp('^01[0-2,5]{1}[0-9]{8}$')).required(),
-    Gender:joi.string().required(),
-    DOB:joi.date().required(),
     Address:joi.string().required(),
     salary:joi.number().required(),
     Days:joi.array().required(),
@@ -118,7 +116,6 @@ export const NurseValidate=joi.object({
 export const UpdateNurseValidate=joi.object({
     name:joi.string().required().min(3).max(20),
     Mobile:joi.string().pattern(new RegExp('^01[0-2,5]{1}[0-9]{8}$')).required(),
-    DOB:joi.date().required(),
     Address:joi.string().required(),
     Specialization:joi.string().required(),
     salary:joi.number().required(),

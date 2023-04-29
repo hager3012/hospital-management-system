@@ -53,13 +53,13 @@ export const  findOneEmployee=catchAsncError( async(req,res,next)=>{
 // //////////////////////////////////////
 export const UpdateEmployee= catchAsncError(async(req,res,next)=>{
   const {id}=req.params;
-  const {name,Mobile,Gender,DOB,Address,Days,Time,salary,role}=req.body;
+  const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findEmployee=await Employee.findById(id);
   if(findEmployee){
     await Timing.updateMany({_id:findEmployee.Times},{Days,Time})
     await Payment.updateOne({_id:findEmployee.Salary},{Salary:salary})
-    let Employees= await Employee.findByIdAndUpdate(id,{name,Mobile,Gender,DOB,Address} ,{new:true}).populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
+    let Employees= await Employee.findByIdAndUpdate(id,{name,Mobile,Address} ,{new:true}).populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
       'Salary','-user -__v -createdAt -updatedAt -_id'
     )
   

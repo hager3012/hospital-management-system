@@ -60,13 +60,13 @@ export const  findOneAccountant=catchAsncError( async(req,res,next)=>{
 // //////////////////////////////////////
 export const UpdateAccountant= catchAsncError(async(req,res,next)=>{
   const {id}=req.params;
-  const {name,email,password,Mobile,Gender,DOB,Address,Days,Time,salary,role}=req.body;
+  const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findAccountant=await Accountant.findById(id);
   if(findAccountant){
     await Timing.updateMany({_id:findAccountant.Times},{Days,Time})
-    await Payment.updateOne({user:findAccountant.Salary})
-    await userModel.findByIdAndUpdate(findAccountant.userId,{name,email,password,Mobile,Gender,DOB,Address,role},{new:true})
+    await Payment.updateOne({user:findAccountant.Salary},{Salary:salary})
+    await userModel.findByIdAndUpdate(findAccountant.userId,{name,Mobile,Address},{new:true})
     let Accountants= await Accountant.findByIdAndUpdate(id,{userId:findAccountant.userId},{new:true}).populate('userId','-_id -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
       'Salary','-user -__v -createdAt -updatedAt -_id'
     )

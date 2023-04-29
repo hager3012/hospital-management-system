@@ -62,7 +62,7 @@ export const  findOneNurse=catchAsncError( async(req,res,next)=>{
 // //////////////////////////////////////
 export const UpdateNurse= catchAsncError(async(req,res,next)=>{
   const {id}=req.params;
-  const {name,Mobile,DOB,Address,Specialization,Days,Time,salary}=req.body;
+  const {name,Mobile,Address,Specialization,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findNurse=await Nurse.findById(id);
   if(findNurse){

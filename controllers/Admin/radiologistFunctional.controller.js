@@ -62,13 +62,13 @@ export const  findOneRadiologist=catchAsncError( async(req,res,next)=>{
 // //////////////////////////////////////
 export const UpdateRadiologist= catchAsncError(async(req,res,next)=>{
   const {id}=req.params;
-  const {name,Mobile,Gender,DOB,Address,Days,Time,salary}=req.body;
+  const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findRadiologist=await radiologist.findById(id);
   if(findRadiologist){
     await Timing.updateMany({_id:findRadiologist.Times},{Days,Time})
     await Payment.updateOne({_id:findRadiologist.Salary},{Salary:salary})
-    await userModel.findByIdAndUpdate(findRadiologist.userId,{name,Mobile,Gender,DOB,Address},{new:true})
+    await userModel.findByIdAndUpdate(findRadiologist.userId,{name,Mobile,Address},{new:true})
     let Radiologists= await radiologist.findById(id ,{new:true}).populate('userId','-_id -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
       'Salary','-user -__v -createdAt -updatedAt -_id'
     )
