@@ -51,13 +51,22 @@ export const BookDoctor=catchAsncError( async(req,res,next)=> {
 }) 
 export const ViewAppointment=catchAsncError( async(req,res,next)=> {
   let userID=req.query.userID;
+  let doctor=[];
   let patient =await Patient.findOne({user:userID});
   if(!patient){
     return next(new AppError('Patient is Not Found',422))
   }
-  let time=await appointment.findOne({Patient:patient._id},{__v:0,createdAt:0,updatedAt:0,Patient:0})
-  let doctor=await Doctor.findById(time.Doctor,{Experience:0,Language:0,Times:0,Salary:0,__v:0,createdAt:0,updatedAt:0}).populate('userId','name Specialization -_id')
-  res.json({message:'success',Doctor:doctor,Time:time,status:200})
+  let time=await appointment.find({Patient:patient._id},{__v:0,createdAt:0,updatedAt:0,Patient:0}).then(async(data)=>{
+    for(let i=0;i<data.length;i++){
+      let result=await Doctor.findById(data[i].Doctor,{Experience:0,Language:0,Times:0,Salary:0,__v:0,createdAt:0,updatedAt:0}).populate('userId','name Specialization -_id');
+      if(result){
+        doctor.push(result,data[i]);
+      }
+
+    }
+
+  })
+  res.json({message:'success',Doctor:doctor,status:200})
   }) 
   ////////////////////////////////////////////////////////
   export const addMedicalHistory=catchAsncError( async(req,res,next)=> {
