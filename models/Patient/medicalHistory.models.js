@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 const Schema =mongoose.Schema;
 const medicalHistorySchema=new Schema({
     Conditions:{
-        type:[],
+        type:{},
         required:true
     },
     symptoms:{
-        type:[],
+        type:{},
         required:true
     },
     medication:{
