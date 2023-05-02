@@ -4,8 +4,11 @@ import { prescription } from "../../models/Doctors/prescription.models.js";
 import { Patient } from "../../models/Patient/Patient.models.js";
 import { appointment } from "../../models/Patient/appointment.models.js";
 import { medicalHistory } from "../../models/Patient/medicalHistory.models.js";
+import { Medicine } from "../../models/Pharmancy/medicine.models.js";
+import { Room } from "../../models/rooms/room.model.js";
 import { AppError } from "../../util/AppError.js";
 import { catchAsncError } from "../../util/catchAsncError.js";
+import { bookRoom } from './../../models/rooms/bookRoom.models.js';
 
 export const searchDoctor=catchAsncError( async(req,res,next)=> {
      await  Doctor.find({confirmTiming:"true"},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email Gender').populate({path:'Times'  }).then((response=>{
@@ -49,6 +52,24 @@ export const BookDoctor=catchAsncError( async(req,res,next)=> {
       res.json({message:'success',status:200});
     }
 }) 
+///////////////////////////////////////////////////////
+export const cancelBookDoctor=catchAsncError(async(req,res,next)=>{
+  let {doctorID,userID}=req.query;
+  let findDoctor=await Doctor.findById(doctorID);
+  if(!findDoctor){
+    return next(new AppError('Doctor is Not Found',422))
+  }
+  let patient =await Patient.findOne({user:userID});
+  await appointment.findOneAndDelete(({Patient:patient._id,Doctor:doctorID})).then((data)=>{
+    if(data){
+      res.json({message:'success',status:200})
+    }
+    else{
+      res.json({message:'appointment is canceled',status:200})
+    }
+
+  })
+})
 export const ViewAppointment=catchAsncError( async(req,res,next)=> {
   let userID=req.query.userID;
   let doctor=[];
@@ -127,4 +148,63 @@ export const viewPrescription=catchAsncError(async(req,res,next)=>{
       }
       res.json({message:'success',data,status:200})
   });
+})
+/////////////////////////////////////////////////
+export const checkMedicine=catchAsncError(async(req,res,next)=>{
+  let {medicine}=req.body;
+  await Medicine.findOne({Medicine_name:medicine}).then(data=>{
+    if(data){
+      res.json({message:'Found',status:200})
+    }else{
+      res.json({message:'NotFound',status:200})
+    }
+  })
+})
+/////////////////////////////////////////////////////////
+export const checkMedicalHistory=catchAsncError(async(req,res,next)=>{
+  let {userID}=req.query;
+  let patient=await Patient.findOne({user:userID});
+  if(!patient){
+    return next(new AppError('Patient Not Found',422))
+  }
+  await medicalHistory.findOne({Patient:patient._id}).then((data)=>{
+    if(data){
+      res.json({message:'true',status:200})
+    }
+    else{
+      res.json({message:'false',status:200})
+    }
+  })
+})
+export const viewRoom=catchAsncError(async(req,res,next)=>{
+  await Room.find({status:"false"}).then((data)=>{
+    if(data.length){
+      res.json({message:'success',data,status:200})
+    }
+    else{
+      next(new AppError('No Available Room',422))
+    }
+  })
+})
+export const BookRoom=catchAsncError(async(req,res,next)=>{
+  let {userID,roomID}=req.query;
+  let patient=await Patient.findOne({user:userID});
+  if(!patient){
+    return next(new AppError('Patient Not Found',422))
+  }
+  await bookRoom.insertMany({Patient:patient._id,Room:roomID}).then(async()=>{
+    await Room.updateOne({_id:roomID,status:"true"});
+    res.json({message:'success',status:200})
+  })
+})
+export const cancelRoom=catchAsncError(async(req,res,next)=>{
+  let {userID,roomID}=req.query;
+  let patient=await Patient.findOne({user:userID});
+  if(!patient){
+    return next(new AppError('Patient Not Found',422))
+  }
+  await bookRoom.deleteOne({Patient:patient._id,Room:roomID}).then(async()=>{
+    await Room.updateOne({_id:roomID,status:"false"});
+    res.json({message:'success',status:200})
+  })
 })

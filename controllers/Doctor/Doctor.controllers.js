@@ -2,6 +2,8 @@ import { Doctor } from "../../models/Doctors/Doctors.models.js";
 import { bookingTime } from "../../models/Doctors/bookingTime.models.js";
 import { prescription } from "../../models/Doctors/prescription.models.js";
 import { appointment } from "../../models/Patient/appointment.models.js";
+import { Disease } from "../../models/Patient/disease.models.js";
+import { medicalHistory } from "../../models/Patient/medicalHistory.models.js";
 import { Timing } from "../../models/Timing/Timing.models.js";
 import { userModel } from "../../models/user.model.js";
 import { AppError } from "../../util/AppError.js";
@@ -100,4 +102,49 @@ export const updatePrescription=catchAsncError(async(req,res,next)=>{
         }
         res.json({message:'success',data,status:200})
     });
+})
+export const addPatientDisease=catchAsncError(async(req,res,next)=>{
+    let patientID=req.query.patientID;
+    let {disease}=req.body;
+    await Disease.findOne({Patient:patientID}).then(async(data)=>{
+        if(!data){
+            let arrayOfDisease=[];
+            arrayOfDisease.push(disease);
+            await Disease.insertMany({Patient:patientID,Disease:arrayOfDisease}).then(()=>{
+                res.json({message:'success',status:200})
+            })
+        }
+        else{
+            let arrayOfDisease=data.Disease;
+            arrayOfDisease.push(disease)
+            await Disease.updateOne({Patient:patientID},{Disease:arrayOfDisease}).then(()=>{
+                res.json({message:'success',status:200})
+            })
+        }
+    })
+    
+})
+export const deletePatientDisease=catchAsncError(async(req,res,next)=>{
+    let patientID=req.query.patientID;
+    let {disease}=req.body;
+    await Disease.findOne({Patient:patientID}).then(async(data)=>{
+        let arrayOfDisease=data.Disease;
+        let diseaseIndex =arrayOfDisease.indexOf(disease);
+        arrayOfDisease.splice(diseaseIndex, 1);
+        await Disease.updateOne({Patient:patientID},{Disease:arrayOfDisease}).then(()=>{
+            res.json({message:'success',status:200})
+        })
+    })
+})
+////////////////////////////////////////////////////
+export const viewMedicalHistory =catchAsncError(async(req,res,next)=>{
+    let patientID=req.query.patientID;
+    await medicalHistory.findOne({Patient:patientID},{_id:0,Patient:0,__v:0,createdAt:0,updatedAt:0}).then(async(data)=>{
+        if(data){
+            res.json({message:'success',data,status:200})
+        }
+        else{
+            next(new AppError('Patient Not Add Medical History',422))
+        }
+    })
 })
