@@ -35,7 +35,7 @@ export const addLaboratoriest=catchAsncError(async(req,res,next)=>{
 })
 ////////////////////////////////////////
 export const findAllLaboratoriest=catchAsncError( async(req,res,next)=> {
-  const {currentPage} = req.params || 1;
+  const currentPage = req.query.currentPage || 1;
   const perPage = 10;
   let totalLaboratoriest;
   let Laboratoriests=  await Laboratoriest.find().countDocuments()
@@ -61,7 +61,7 @@ export const  findOneLaboratoriest=catchAsncError( async(req,res,next)=>{
 })
 // //////////////////////////////////////
 export const UpdateLaboratoriest= catchAsncError(async(req,res,next)=>{
-  const {id}=req.params;
+  const id=req.query.LaboratoriestID;
   const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findLaboratoriest=await Laboratoriest.findById(id);
@@ -80,7 +80,8 @@ export const UpdateLaboratoriest= catchAsncError(async(req,res,next)=>{
   })
 // /////////////////////////////////////////////// 
 export const DeleteLaboratoriest= catchAsncError(async(req,res,next)=>{
-  const {currentPage,id}=req.params;
+  const id=req.query.LaboratoriestID;
+  const currentPage=req.query.currentPage;
   let LaboratoriestOne=await Laboratoriest.findById(id).populate('userId',' -confirmEmail -role -password -__v');
   if(LaboratoriestOne){
     await Laboratoriest.deleteOne({_id:id},{new:true}).populate('userId');

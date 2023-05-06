@@ -24,7 +24,7 @@ export const addEmployee=catchAsncError(async(req,res,next)=>{
 })
 ////////////////////////////////////////
 export const findAllEmployee=catchAsncError( async(req,res,next)=> {
-  const {currentPage} = req.params || 1;
+  const {currentPage} = req.query || 1;
   const perPage = 10;
   let totalEmployee;
   let Employees=  await Employee.find().countDocuments()
@@ -38,7 +38,7 @@ export const findAllEmployee=catchAsncError( async(req,res,next)=> {
     })
 // ///////////////////////////////////////
 export const  findOneEmployee=catchAsncError( async(req,res,next)=>{
-  let {id}=req.params;
+  let id=req.query.EmployeeID;
   let Employees=await Employee.findById(id,{__v:0}).populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
     'Salary','-user -__v -createdAt -updatedAt -_id'
   )
@@ -52,7 +52,7 @@ export const  findOneEmployee=catchAsncError( async(req,res,next)=>{
 })
 // //////////////////////////////////////
 export const UpdateEmployee= catchAsncError(async(req,res,next)=>{
-  const {id}=req.params;
+  const id=req.query.EmployeeID;
   const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findEmployee=await Employee.findById(id);
@@ -71,7 +71,8 @@ export const UpdateEmployee= catchAsncError(async(req,res,next)=>{
   })
 // /////////////////////////////////////////////// 
 export const DeleteEmployee= catchAsncError(async(req,res,next)=>{
-    const {currentPage,id}=req.params;
+  let id=req.query.EmployeeID;
+  let currentPage=req.query.currentPage;
   const EmployeeOne=await Employee.findById(id);
   if(EmployeeOne){
     await Employee.deleteOne({_id:id},{new:true});

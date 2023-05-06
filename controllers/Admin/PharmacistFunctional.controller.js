@@ -35,7 +35,7 @@ export const addPharmacist=catchAsncError(async(req,res,next)=>{
 })
 ////////////////////////////////////////
 export const findAllPharmacist=catchAsncError( async(req,res,next)=> {
-  const {currentPage} = req.params || 1;
+  const {currentPage} = req.query || 1;
   const perPage = 10;
   let totalpharmacists;
   let pharmacists=  await pharmacist.find().countDocuments()
@@ -62,7 +62,7 @@ export const  findOnePharmacist=catchAsncError( async(req,res,next)=>{
 })
 // //////////////////////////////////////
 export const UpdatePharmacist= catchAsncError(async(req,res,next)=>{
-  const {id}=req.params;
+  const id=req.query.pharmacistID;
   const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findpharmacist=await pharmacist.findById(id);
@@ -81,7 +81,8 @@ export const UpdatePharmacist= catchAsncError(async(req,res,next)=>{
   })
 // /////////////////////////////////////////////// 
 export const DeletePharmacist= catchAsncError(async(req,res,next)=>{
-  const {currentPage,id}=req.params;
+  let id=req.query.pharmacistID;
+  const currentPage=req.query.currentPage;
   let pharmacistOne=await pharmacist.findById(id).populate('userId',' -confirmEmail -role -password -__v');
   if(pharmacistOne){
     await pharmacist.deleteOne({_id:id},{new:true}).populate('userId');

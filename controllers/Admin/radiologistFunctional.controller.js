@@ -34,7 +34,7 @@ export const addRadiologist=catchAsncError(async(req,res,next)=>{
 })
 ////////////////////////////////////////
 export const findAllRadiologist=catchAsncError( async(req,res,next)=> {
-  const {currentPage} = req.params || 1;
+  const {currentPage} = req.query || 1;
   const perPage = 10;
   let totalradiologists;
   let radiologists=  await radiologist.find().countDocuments()
@@ -61,7 +61,7 @@ export const  findOneRadiologist=catchAsncError( async(req,res,next)=>{
 })
 // //////////////////////////////////////
 export const UpdateRadiologist= catchAsncError(async(req,res,next)=>{
-  const {id}=req.params;
+  const id=req.query.RadiologistID;
   const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findRadiologist=await radiologist.findById(id);
@@ -81,7 +81,8 @@ export const UpdateRadiologist= catchAsncError(async(req,res,next)=>{
   })
 // /////////////////////////////////////////////// 
 export const DeleteRadiologist= catchAsncError(async(req,res,next)=>{
-  const {currentPage,id}=req.params;
+  let id=req.query.RadiologistID;
+  const currentPage=req.query.currentPage;
   let radiologistOne=await radiologist.findById(id).populate('userId',' -confirmEmail -role -password -__v');
   if(radiologistOne){
     await radiologist.deleteOne({_id:id},{new:true}).populate('userId');

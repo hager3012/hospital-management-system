@@ -32,7 +32,7 @@ export const addAccountant=catchAsncError(async(req,res,next)=>{
 })
 ////////////////////////////////////////
 export const findAllAccountant=catchAsncError( async(req,res,next)=> {
-  const {currentPage} = req.params || 1;
+  const {currentPage} = req.query || 1;
   const perPage = 10;
   let totalItems;
   let Accountants=  await Accountant.find().countDocuments()
@@ -46,7 +46,7 @@ export const findAllAccountant=catchAsncError( async(req,res,next)=> {
     })
 // ///////////////////////////////////////
 export const  findOneAccountant=catchAsncError( async(req,res,next)=>{
-  let {id}=req.params;
+  let id=req.query.AccountantID;
   let Accountants=await Accountant.findById(id,{__v:0}).populate('userId',' -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
     'Salary','-user -__v -createdAt -updatedAt -_id'
   )
@@ -59,7 +59,7 @@ export const  findOneAccountant=catchAsncError( async(req,res,next)=>{
 })
 // //////////////////////////////////////
 export const UpdateAccountant= catchAsncError(async(req,res,next)=>{
-  const {id}=req.params;
+  const id=req.query.AccountantID;
   const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findAccountant=await Accountant.findById(id);
@@ -79,7 +79,8 @@ export const UpdateAccountant= catchAsncError(async(req,res,next)=>{
   })
 // /////////////////////////////////////////////// 
 export const DeleteAccountant= catchAsncError(async(req,res,next)=>{
-    const {currentPage,id}=req.params;
+    const currentPage=req.query.currentPage;
+    let id=req.query.AccountantID;;
   let AccountantOne=await Accountant.findById(id).populate('userId',' -confirmEmail -role -password -__v');
   if(AccountantOne){
     await Accountant.deleteOne({_id:id},{new:true}).populate('userId');
