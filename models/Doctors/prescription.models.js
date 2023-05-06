@@ -13,19 +13,15 @@ const prescriptionSchema=new Schema({
         },
       Advice:{
         type:String,
-        required:true
       },
       Medication:{
         type:[],
-        required:true
       },
       Lab:{
         type:[],
-        required:true
       },
       X_ray:{
         type:[],
-        required:true
       }
     },
       {
