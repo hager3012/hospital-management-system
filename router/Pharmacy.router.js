@@ -6,8 +6,8 @@ import { AddMedicineValidate } from '../validation/pharmacy.validation.js';
 import { DeleteMedicine, UpdateMedicine, addMedicine, findAll, findOne } from '../controllers/Pharmacy/Medicine.controller.js';
 const PharmacyRouter =Router();
 PharmacyRouter.post('/AddMedicine',_auth,validation(AddMedicineValidate),authorPharmacy,addMedicine)
-PharmacyRouter.get('/findAll/:currentPage',_auth,authorPharmacy,findAll)
-PharmacyRouter.put('/UpdateMedicine/:id',_auth,validation(AddMedicineValidate),authorPharmacy,UpdateMedicine)
-PharmacyRouter.get('/findOne/:id',_auth,authorPharmacy,findOne);
-PharmacyRouter.delete('/deleteMedicine/:currentPage/:id',_auth,authorPharmacy,DeleteMedicine);
+PharmacyRouter.get('/findAll',_auth,authorPharmacy,findAll)
+PharmacyRouter.put('/UpdateMedicine',_auth,validation(AddMedicineValidate),authorPharmacy,UpdateMedicine)
+PharmacyRouter.get('/findOne',_auth,authorPharmacy,findOne);
+PharmacyRouter.delete('/deleteMedicine',_auth,authorPharmacy,DeleteMedicine);
 export default PharmacyRouter;   

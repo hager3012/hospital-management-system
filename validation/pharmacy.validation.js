@@ -4,6 +4,5 @@ export const AddMedicineValidate=joi.object({
     Medicine_quantity:joi.number().required(),
     Medicine_type:joi.string().required(),
     Medicine_price:joi.number().required(),
-    exp_date:joi.string().pattern(new RegExp('^[1-9][0-9]{3}-[1-9][0-9]-[0-9]{1,2}$')).required(),
-    namePharmacy:joi.string().required(),
+    exp_date:joi.string().pattern(new RegExp('^[1-9][0-9]{3}-[1-9][0-9]-[0-9]{1,2}$')).required()
 });
