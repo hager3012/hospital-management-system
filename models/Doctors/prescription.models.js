@@ -22,6 +22,10 @@ const prescriptionSchema=new Schema({
       },
       X_ray:{
         type:[],
+      },
+      datePatient:{
+        type:String,
+        required:true
       }
     },
       {

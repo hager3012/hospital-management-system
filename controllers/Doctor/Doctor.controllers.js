@@ -74,21 +74,29 @@ export const ViewAppointment=catchAsncError( async(req,res,next)=> {
     }) 
 export const addPrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
-    let {Advice,Medication,Lab,X_ray}=req.body;
+    let {Advice,Medication,Lab,X_ray,datePatient}=req.body;
     let doctor=await Doctor.findOne({userId:userID});
     let patient=await Patient.findById({_id:patientID});
     if(!doctor&&!patient){
-        return next(new AppError('Doctor or Patient is Not Found',422))
+        return next(new AppError('Doctor or Patient is Not Found',203))
     }
-    await prescription.insertMany({doctor:userID,Patient:patientID,Advice,Medication,Lab,X_ray}).then(()=>{
-        res.json({message:'success',status:200})
+    prescription.findOne({datePatient:datePatient}).then(async(data)=>{
+        if(!data){
+            await prescription.insertMany({doctor:userID,Patient:patientID,Advice,Medication,Lab,X_ray,datePatient}).then(()=>{
+                res.json({message:'success',status:200})
+            })
+        }
+        else{
+            return next(new AppError('You added prescription in this date you can update',406))
+        }
     })
+
 })    
 export const viewPrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
-    await prescription.findOne({doctor:userID,Patient:patientID}).then((data)=>{
+    await prescription.find({doctor:userID,Patient:patientID}).then((data)=>{
         if(!data){
-            return next(new AppError('prescription is Not Found',422))
+            return next(new AppError('prescription is Not Found',402))
         }
         res.json({message:'success',data,status:200})
     });
@@ -98,7 +106,7 @@ export const updatePrescription=catchAsncError(async(req,res,next)=>{
     let {Advice,Medication,Lab,X_ray}=req.body;
     await prescription.findOneAndUpdate({doctor:userID,Patient:patientID},{Advice,Medication,Lab,X_ray},{new:true}).then((data)=>{
         if(!data){
-            return next(new AppError('prescription is Not Found',422))
+            return next(new AppError('prescription is Not Found',402))
         }
         res.json({message:'success',data,status:200})
     });

@@ -11,6 +11,6 @@ DoctorRouter.post('/addPrescription',_auth,authorDoctor,addPrescription)
 DoctorRouter.get('/viewPrescription',_auth,authorDoctor,viewPrescription)
 DoctorRouter.put('/updatePrescription',_auth,authorDoctor,updatePrescription);
 DoctorRouter.post('/addPatientDisease',_auth,authorDoctor,addPatientDisease);
-DoctorRouter.put('/deletePatientDisease',_auth,authorDoctor,deletePatientDisease);
+DoctorRouter.delete('/deletePatientDisease',_auth,authorDoctor,deletePatientDisease);
 DoctorRouter.get('/viewMedicalHistory',_auth,authorDoctor,viewMedicalHistory)
 export default DoctorRouter;   
