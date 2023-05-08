@@ -134,7 +134,7 @@ export const addPatientDisease=catchAsncError(async(req,res,next)=>{
 })
 export const deletePatientDisease=catchAsncError(async(req,res,next)=>{
     let patientID=req.query.patientID;
-    let {disease}=req.body;
+    let disease=req.query.disease;
     await Disease.findOne({Patient:patientID}).then(async(data)=>{
         let arrayOfDisease=data.Disease;
         let diseaseIndex =arrayOfDisease.indexOf(disease);
