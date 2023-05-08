@@ -138,10 +138,13 @@ export const deletePatientDisease=catchAsncError(async(req,res,next)=>{
     await Disease.findOne({Patient:patientID}).then(async(data)=>{
         let arrayOfDisease=data.Disease;
         let diseaseIndex =arrayOfDisease.indexOf(disease);
-        arrayOfDisease.splice(diseaseIndex, 1);
-        await Disease.updateOne({Patient:patientID},{Disease:arrayOfDisease}).then(()=>{
-            res.json({message:'success',status:200})
-        })
+        if(diseaseIndex==-1){
+            arrayOfDisease.splice(diseaseIndex, 1);
+            await Disease.updateOne({Patient:patientID},{Disease:arrayOfDisease}).then(()=>{
+                res.json({message:'success',status:200})
+            })
+        }
+
     })
 })
 ////////////////////////////////////////////////////
