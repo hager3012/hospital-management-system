@@ -1,6 +1,7 @@
+
 import multer from "multer";
 import { v4 as uuidv4 } from 'uuid';
-export const fileUpload=(fieldName)=>{
+export const fileUpload=()=>{
     const storage = multer.diskStorage({
         destination: function (req, file, cb) {
           cb(null, 'uploads/')
@@ -10,12 +11,12 @@ export const fileUpload=(fieldName)=>{
         }
       })
       function fileFilter (req, file, cb) {
-        if(file.mimetype.startsWith('image')){
+        if(file.mimetype.startsWith()){
             cb(null, true)
         }else{
-            cb(null, false)
+            cb(null, false) 
         }
       }
       const upload = multer({ storage})
-      return upload.single(fieldName)
+      return upload.single()
 }

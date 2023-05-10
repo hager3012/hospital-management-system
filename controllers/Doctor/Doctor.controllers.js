@@ -103,8 +103,8 @@ export const viewPrescription=catchAsncError(async(req,res,next)=>{
 })
 export const updatePrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
-    let {Advice,Medication,Lab,X_ray}=req.body;
-    await prescription.findOneAndUpdate({doctor:userID,Patient:patientID},{Advice,Medication,Lab,X_ray},{new:true}).then((data)=>{
+    let {Advice,Medication,Lab,X_ray,datePatient}=req.body;
+    await prescription.findOneAndUpdate({doctor:userID,Patient:patientID,datePatient},{Advice,Medication,Lab,X_ray},{new:true}).then((data)=>{
         if(!data){
             return next(new AppError('prescription is Not Found',402))
         }

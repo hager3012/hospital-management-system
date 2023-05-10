@@ -110,3 +110,27 @@ export const authorNurse=async(req,res,next)=>{
         }
     });
 };
+/////////////////////////////////////////////////////
+export const authorLaboratoriest=async(req,res,next)=>{
+    let token=req.header('token');
+    jwt.verify(token, process.env.JWT_KEY, async function(err, decoded) {
+        if(err){
+            next(new AppError(err,400))
+        }
+        else{
+            let id=decoded.id;
+            const user=await userModel.findById(id)
+            if(user){
+                if(user.role=="Laboratoriest"){
+                    next();
+                }else{
+                    next(new AppError('Not authorized',403))
+                }
+            }else{
+                next(new AppError('User Not Found',404))
+            }
+            
+            
+        }
+    });
+};

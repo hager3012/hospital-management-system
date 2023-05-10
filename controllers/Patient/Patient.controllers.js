@@ -6,6 +6,7 @@ import { appointment } from "../../models/Patient/appointment.models.js";
 import { medicalHistory } from "../../models/Patient/medicalHistory.models.js";
 import { Medicine } from "../../models/Pharmancy/medicine.models.js";
 import { Room } from "../../models/rooms/room.model.js";
+import { userModel } from "../../models/user.model.js";
 import { AppError } from "../../util/AppError.js";
 import { catchAsncError } from "../../util/catchAsncError.js";
 import { bookRoom } from './../../models/rooms/bookRoom.models.js';
@@ -140,13 +141,19 @@ export const updateMedicalHistory =catchAsncError(async(req,res,next)=>{
 })
 ///////////////////////////////////////////////////
 export const viewPrescription=catchAsncError(async(req,res,next)=>{
-  let {userID}=req.query;
+  let userID=req.query.userID;
+  let arrayOfPrescription=[];
   let patient=await Patient.findOne({user:userID});
-  await prescription.findOne({Patient:patient._id}).then((data)=>{
+  await prescription.find({Patient:patient._id}).then(async(data)=>{
       if(!data){
-          return next(new AppError('prescription is Not Found',422))
+          return next(new AppError('prescriptions is Not Found',422))
       }
-      res.json({message:'success',data,status:200})
+      for(let i=0;i<data.length;i++){
+        await userModel.findOne({_id:data[i].doctor},{name:1,_id:0}).then((result)=>{
+          arrayOfPrescription.push(result)
+        })
+      }
+      res.json({message:'success',data,DoctorName:arrayOfPrescription,status:200})
   });
 })
 /////////////////////////////////////////////////

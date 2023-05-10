@@ -1,4 +1,3 @@
-import { required } from "joi";
 import mongoose from "mongoose";
 const Schema =mongoose.Schema;
 const LabReportSchema=new Schema({
@@ -10,9 +9,14 @@ const LabReportSchema=new Schema({
         type:String,
         required:true
     },
-    User:{
+    createdBy:{
         type:mongoose.Types.ObjectId,
+        ref:'user',
         required:true,
+    },
+    price:{
+        type:Number,
+        required:true
     },
     Patient:{
         type:mongoose.Types.ObjectId,
