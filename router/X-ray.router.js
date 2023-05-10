@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { auth as _auth } from '../Middleware/user.auth.js';
+import { fileUpload } from './../util/fileUpload.js';
+import {  authorRadiologist } from '../Middleware/author.js';
+import { addX_RayReport, deleteX_RayReport, viewX_RayReport, viewX_RayReportDetails } from '../controllers/cender Lab&X-ray/Radiologist.controller.js';
+const RadiologistRouter =Router();
+RadiologistRouter.post('/addX_RayReport',fileUpload(),_auth,authorRadiologist,addX_RayReport);
+RadiologistRouter.get('/viewX_RayReport',_auth,authorRadiologist,viewX_RayReport);
+RadiologistRouter.get('/viewX_RayReportDetails',_auth,authorRadiologist,viewX_RayReportDetails);
+RadiologistRouter.delete('/deleteX_RayReport',_auth,authorRadiologist,deleteX_RayReport);
+export default RadiologistRouter;  

@@ -15,6 +15,7 @@ import DoctorRouter from './router/Doctor.router.js';
 import PatientRouter from './router/Patient.router.js';
 import NurseRouter from './router/Nurse.router.js';
 import LabratoriestRouter from './router/Lab.router.js';
+import RadiologistRouter from './router/X-ray.router.js';
 dotenv.config();
 const app=express();
 app.use(helmet());
@@ -36,7 +37,8 @@ app.use('/Pharmacy',PharmacyRouter);
 app.use('/Doctor',DoctorRouter) ;
 app.use('/Nurse',NurseRouter);
 app.use('/patient',PatientRouter) ;
-app.use('/Labratoriest',LabratoriestRouter)
+app.use('/Labratoriest',LabratoriestRouter);
+app.use('/Radiologist',RadiologistRouter)
 app.all('*',(req,res,next)=>{
     next(new AppError("invalid url - can’t access this endPoind"+req.originalUrl,404))
 }) 
