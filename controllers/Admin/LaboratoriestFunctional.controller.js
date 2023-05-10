@@ -49,7 +49,7 @@ export const findAllLaboratoriest=catchAsncError( async(req,res,next)=> {
     })
 // ///////////////////////////////////////
 export const  findOneLaboratoriest=catchAsncError( async(req,res,next)=>{
-  let {id}=req.params;
+  let id=req.query.LaboratoriestID;
   let Laboratoriests=await Laboratoriest.findById(id,{__v:0}).populate('userId',' -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
     'Salary','-user -__v -createdAt -updatedAt -_id'
   )
