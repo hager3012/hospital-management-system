@@ -48,7 +48,7 @@ export const findAllRadiologist=catchAsncError( async(req,res,next)=> {
     })
 // ///////////////////////////////////////
 export const  findOneRadiologist=catchAsncError( async(req,res,next)=>{
-  let {id}=req.query.RadiologistID;
+  let id=req.query.RadiologistID;
   let radiologists=await radiologist.findById(id,{__v:0}).populate('userId',' -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
     'Salary','-user -__v -createdAt -updatedAt -_id'
   )
