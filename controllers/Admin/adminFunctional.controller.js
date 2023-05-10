@@ -4,8 +4,8 @@ import { AppError } from "../../util/AppError.js";
 import { catchAsncError } from "../../util/catchAsncError.js"
 
 export const addRoom=catchAsncError(async(req,res,next)=>{
-    let {RoomType}=req.body;
-    await Room.insertMany({RoomType}).then(()=>{
+    let {RoomType,price}=req.body;
+    await Room.insertMany({RoomType,price}).then(()=>{
         res.json({message:'success',status:200})
     }).catch((err)=>{
         next(AppError('Failed',422));

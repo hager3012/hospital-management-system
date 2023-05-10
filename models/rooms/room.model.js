@@ -9,6 +9,10 @@ const RoomSchema=new Schema({
         RoomType:{
             type:String,
             required:true
+        },
+        price:{
+            type:String,
+            required:true
         }
 },
 {
