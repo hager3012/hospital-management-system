@@ -95,7 +95,7 @@ export const viewPatient=catchAsncError(async(req,res,next)=>{
                         (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
                         result.user.DOB=age;
                         arrayOfPatientHaveReport.push({result,X_Ray:data[i].X_ray})
-                })
+                }) 
             }
         }
     })
