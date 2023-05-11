@@ -9,6 +9,9 @@ import { userModel } from "../../models/user.model.js";
 import { AppError } from "../../util/AppError.js";
 import { catchAsncError } from "../../util/catchAsncError.js";
 import { Patient } from './../../models/Patient/Patient.models.js';
+import { bookRoom } from './../../models/rooms/bookRoom.models.js';
+import { LabReport } from './../../models/CenterLab&radio/lab/LabReport.models.js';
+import { X_RayReport } from './../../models/CenterLab&radio/X-ray/X_RayReport.models.js';
 
 export const confirmTiming =catchAsncError(async(req,res,next)=>{
     let DoctorId=req.query.userID;
@@ -169,4 +172,64 @@ export const viewMedicalHistory =catchAsncError(async(req,res,next)=>{
             next(new AppError('Patient Not Add Medical History',422))
         }
     })
+})
+/////////////////////////////////////////////////////////////////////
+export const viewPatientDetails =catchAsncError(async(req,res,next)=>{
+    let {patientID,userID}=req.query;
+    let patient={};
+    let doctorID;
+    await Patient.findById(patientID).populate('user','name email Mobile DOB Address').then((data)=>{
+        if(!data){
+            return next(new AppError('make sure that this patient exists',406))
+        }
+        let birthdate = new Date(data.user.DOB);
+                let today=new Date();
+                    let age = today.getFullYear() - birthdate.getFullYear() - 
+                    (today.getMonth() < birthdate.getMonth() || 
+                    (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
+        data.user.DOB=age;
+        patient.userDetails=data.user
+    });
+    await Doctor.findOne({userId:userID}).populate('userId').then(async(data)=>{
+        if(data){
+            doctorID=data._id;
+            await appointment.find({Patient:patientID,Doctor:data._id},{_id:0,Patient:0,Doctor:0,__v:0}).then((result)=>{
+                if(result.length!=0){
+                    patient.appointments=result;
+                }
+                
+            })
+        }
+    });
+    await bookRoom.findOne({Patient:patientID}).populate('Room','-__v -_id').then((data)=>{
+        if(data){
+            patient.Room=data.Room;
+        }
+    });
+    await Disease.findOne({Patient:patientID},{Disease:1,_id:0}).then((data)=>{
+        if(data.Disease.length!=0){
+            patient.Disease=data.Disease
+        }
+    })
+    await LabReport.find({Patient:patientID},{__v:0,_id:0,Patient:0}).populate('createdBy','Gender name email Mobile').then((data)=>{
+        if(data.length!=0){
+            patient.LabReport=data;
+        }
+    });
+    await medicalHistory.findOne({Patient:patientID},{__v:0,_id:0,Patient:0}).then((data)=>{
+        if(data){
+            patient.medicalHistory=data;
+        }
+    });
+    await prescription.find({doctor:userID,Patient:patientID},{Patient:0,doctor:0,_id:0}).then((data)=>{
+        if(data.length!=0){
+            patient.prescription=data;
+        }
+    })
+    await X_RayReport.find({Patient:patientID},{__v:0,_id:0,Patient:0}).populate('createdBy','Gender name email Mobile').then((data)=>{
+        if(data.length!=0){
+            patient.X_RayReport=data;
+        }
+    });
+    res.json({data:patient})
 })
