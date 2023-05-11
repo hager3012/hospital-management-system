@@ -16,6 +16,6 @@ PatientRouter.get('/checkMedicine',_auth,authorPatient,checkMedicine);
 PatientRouter.delete('/cancelBookDoctor',_auth,authorPatient,cancelBookDoctor);
 PatientRouter.get('/checkMedicalHistory',_auth,authorPatient,checkMedicalHistory);
 PatientRouter.get('/viewRoom',_auth,authorPatient,viewRoom);
-PatientRouter.post('/BookRoom',_auth,authorPatient,BookRoom);
+PatientRouter.get('/BookRoom',_auth,authorPatient,BookRoom);
 PatientRouter.delete('/cancelRoom',_auth,authorPatient,cancelRoom);
 export default PatientRouter;   
