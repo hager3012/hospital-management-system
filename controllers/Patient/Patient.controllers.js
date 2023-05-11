@@ -3,6 +3,7 @@ import { bookingTime } from "../../models/Doctors/bookingTime.models.js";
 import { prescription } from "../../models/Doctors/prescription.models.js";
 import { Patient } from "../../models/Patient/Patient.models.js";
 import { appointment } from "../../models/Patient/appointment.models.js";
+import { Disease } from "../../models/Patient/disease.models.js";
 import { medicalHistory } from "../../models/Patient/medicalHistory.models.js";
 import { Medicine } from "../../models/Pharmancy/medicine.models.js";
 import { Room } from "../../models/rooms/room.model.js";
@@ -227,4 +228,32 @@ export const viewBookRoom=catchAsncError(async(req,res,next)=>{
     })
   })
   
+})
+//////////////////////////////////////////////////////////////
+export const patientInformation=catchAsncError(async(req,res,next)=>{
+  let userID=req.query.userID;
+  await userModel.findById(userID,{name:1 , Gender:1 , _id:0 , Mobile:1, DOB:1}).then((data)=>{
+    let birthdate = new Date(data.DOB);
+      let today=new Date();
+          let age = today.getFullYear() - birthdate.getFullYear() - 
+          (today.getMonth() < birthdate.getMonth() || 
+          (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
+    data.DOB=age;
+    res.json({message:'success',info:data,status:200})
+  })
+})
+/////////////////////////////////////////////////////////////////
+export const viewDisease=catchAsncError(async(req,res,next)=>{
+  let userID=req.query.userID;
+  await Patient.findOne({user:userID}).then(async(data)=>{
+    if(!data){
+      return next(new AppError('Patient Not Found',422))
+    }
+    await Disease.findOne({Patient:data._id}).then((result)=>{
+      if(!result||!result.Disease.length){
+        return next(new AppError('No Disease for this patient',406))
+      }
+      res.json({message:'success',Disease:result.Disease,status:200})
+    })
+  })
 })
