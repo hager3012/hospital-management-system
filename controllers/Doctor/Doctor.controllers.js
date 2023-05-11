@@ -80,7 +80,7 @@ export const addPrescription=catchAsncError(async(req,res,next)=>{
     if(!doctor&&!patient){
         return next(new AppError('Doctor or Patient is Not Found',203))
     }
-    prescription.findOne({datePatient:datePatient}).then(async(data)=>{
+    prescription.findOne({datePatient:datePatient,Patient:patientID}).then(async(data)=>{
         if(!data){
             await prescription.insertMany({doctor:userID,Patient:patientID,Advice,Medication,Lab,X_ray,datePatient}).then(()=>{
                 res.json({message:'success',status:200})
