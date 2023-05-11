@@ -1,4 +1,6 @@
+import { log } from "console";
 import { X_RayReport } from "../../models/CenterLab&radio/X-ray/X_RayReport.models.js";
+import { prescription } from "../../models/Doctors/prescription.models.js";
 import { Patient } from "../../models/Patient/Patient.models.js";
 import { userModel } from "../../models/user.model.js";
 import { AppError } from "../../util/AppError.js";
@@ -78,4 +80,24 @@ export const deleteX_RayReport=catchAsncError(async(req,res,next)=>{
     }else{
       next(new AppError('Report is Not Found',422))
     }
+})
+////////////////////////////////////////////////////////////////
+export const viewPatient=catchAsncError(async(req,res,next)=>{
+    let arrayOfPatientHaveReport=[];
+    await prescription.find().then(async(data)=>{
+        for(let i=0;i<data.length;i++){
+            if(data[i].X_ray.length){
+                await Patient.findById(data[i].Patient).populate('user','-_id name email Gender Mobile DOB').then((result)=>{
+                    let birthdate = new Date(result.user.DOB);
+                    let today=new Date();
+                        let age = today.getFullYear() - birthdate.getFullYear() - 
+                        (today.getMonth() < birthdate.getMonth() || 
+                        (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
+                        result.user.DOB=age;
+                    arrayOfPatientHaveReport.push(result)
+                })
+            }
+        }
+    })
+    res.json({message:'success',Patient:arrayOfPatientHaveReport,status:200}) ;
 })
