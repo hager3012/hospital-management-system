@@ -96,7 +96,7 @@ export const viewPrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
     await prescription.find({doctor:userID,Patient:patientID}).then((data)=>{
         if(!data){
-            return next(new AppError('prescription is Not Found',402))
+            return next(new AppError('prescription is Not Found',406))
         }
         res.json({message:'success',data,status:200})
     });
@@ -106,7 +106,7 @@ export const updatePrescription=catchAsncError(async(req,res,next)=>{
     let {Advice,Medication,Lab,X_ray,datePatient}=req.body;
     await prescription.findOneAndUpdate({doctor:userID,Patient:patientID,datePatient},{Advice,Medication,Lab,X_ray},{new:true}).then((data)=>{
         if(!data){
-            return next(new AppError('prescription is Not Found',402))
+            return next(new AppError('prescription is Not Found',406))
         }
         res.json({message:'success',data,status:200})
     });
@@ -123,11 +123,19 @@ export const addPatientDisease=catchAsncError(async(req,res,next)=>{
             })
         }
         else{
-            let arrayOfDisease=data.Disease;
-            arrayOfDisease.push(disease)
-            await Disease.updateOne({Patient:patientID},{Disease:arrayOfDisease}).then(()=>{
-                res.json({message:'success',status:200})
+            await Disease.find({Patient:patientID,Disease:disease}).then(async(result)=>{
+                if(result.length==0){
+                    let arrayOfDisease=data.Disease;
+                    arrayOfDisease.push(disease)
+                    await Disease.updateOne({Patient:patientID},{Disease:arrayOfDisease}).then(()=>{
+                        res.json({message:'success',status:200})
+                    })
+                }
+                else{
+                    return next(new AppError('The disease has been added',406))
+                }
             })
+            
         }
     })
     
@@ -138,11 +146,14 @@ export const deletePatientDisease=catchAsncError(async(req,res,next)=>{
     await Disease.findOne({Patient:patientID}).then(async(data)=>{
         let arrayOfDisease=data.Disease;
         let diseaseIndex =arrayOfDisease.indexOf(disease);
-        if(diseaseIndex==-1){
+        if(diseaseIndex!=-1){
             arrayOfDisease.splice(diseaseIndex, 1);
             await Disease.updateOne({Patient:patientID},{Disease:arrayOfDisease}).then(()=>{
                 res.json({message:'success',status:200})
             })
+        }
+        else{
+            next(new AppError('this Disease is deleted',406))
         }
 
     })
