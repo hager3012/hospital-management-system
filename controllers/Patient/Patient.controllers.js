@@ -215,3 +215,16 @@ export const cancelRoom=catchAsncError(async(req,res,next)=>{
     res.json({message:'success',status:200})
   })
 })
+///////////////////////////////////////////////////////////////
+export const viewBookRoom=catchAsncError(async(req,res,next)=>{
+  let userID=req.query.userID;
+  await Patient.findOne({user:userID}).then(async(data)=>{
+    if(!data){
+      return next(new AppError('Patient Not Found',422))
+    }
+    await bookRoom.findOne({Patient:data._id}).populate('Room').then((result)=>{
+      res.json({message:'success',Room:result.Room,status:200})
+    })
+  })
+  
+})
