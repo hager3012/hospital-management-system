@@ -1,4 +1,4 @@
-import { Router } from 'express'; j
+import { Router } from 'express';
 import {  addDoctor, addTiming, DeleteDoctor, findAll, findOne ,UpdateDoctor} from '../controllers/Admin/DoctorFunctions.controller.js';
 import { auth as _auth } from '../Middleware/user.auth.js';
 import { validation } from './../Middleware/validation.js';
