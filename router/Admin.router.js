@@ -52,7 +52,7 @@ AdminRouter.post('/addNurse',_auth,validation(NurseValidate),authorAdmin,addNurs
 AdminRouter.get('/findAllNurse',_auth,authorAdmin,findAllNurse);
 AdminRouter.get('/findOneNurse',_auth,authorAdmin,findOneNurse);
 AdminRouter.put('/UpdateNurse',_auth,validation(UpdateNurseValidate),authorAdmin,UpdateNurse);
-AdminRouter.delete('/DeleteNurse',_auth,authorAdmin,DeleteNurse);
+AdminRouter.delete('/DeleteNurse',_auth,authorAdmin,DeleteNurse); 
 ///////////////////////////////////////////
 AdminRouter.post('/AddTiming',_auth,validation(AddTimingValidate),authorAdmin,addTiming)
 //////////////////////////////////////////////////////
