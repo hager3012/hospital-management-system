@@ -11,7 +11,7 @@ import { addEmployee, DeleteEmployee, findAllEmployee, findOneEmployee, UpdateEm
 import { addAccountant, DeleteAccountant, findAllAccountant, findOneAccountant, UpdateAccountant } from '../controllers/Admin/AccountantFunctional.controller.js';
 import { addNurse, DeleteNurse, findAllNurse, findOneNurse, UpdateNurse } from '../controllers/Admin/NurseFunctional.controllers.js';
 import { addRoom, viewPatients } from '../controllers/Admin/adminFunctional.controller.js';
-const AdminRouter =Router();
+const AdminRouter =Router(); 
 AdminRouter.post('/AddDoctor',_auth,validation(AddDoctorValidate),authorAdmin,addDoctor);
 AdminRouter.get('/findAll',_auth,authorAdmin,findAll);
 AdminRouter.get('/findOneDoctor',_auth,authorAdmin,findOne);
