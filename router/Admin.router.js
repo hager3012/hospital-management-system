@@ -55,7 +55,7 @@ AdminRouter.put('/UpdateNurse',_auth,validation(UpdateNurseValidate),authorAdmin
 AdminRouter.delete('/DeleteNurse',_auth,authorAdmin,DeleteNurse);
 ///////////////////////////////////////////
 AdminRouter.post('/AddTiming',_auth,validation(AddTimingValidate),authorAdmin,addTiming)
-/////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 AdminRouter.post('/addRoom',_auth,authorAdmin,addRoom);
 /////////////////////////////////////////////////////
 AdminRouter.get('/viewPatients',_auth,authorAdmin,viewPatients)
