@@ -178,7 +178,7 @@ export const viewPatientDetails =catchAsncError(async(req,res,next)=>{
     let {patientID,userID}=req.query;
     let patient={};
     let doctorID;
-    await Patient.findById(patientID).populate('user','name email Mobile DOB Address').then((data)=>{
+    await Patient.findById(patientID).populate('user','name email Mobile DOB Address Gender').then((data)=>{
         if(!data){
             return next(new AppError('make sure that this patient exists',406))
         }
@@ -231,5 +231,34 @@ export const viewPatientDetails =catchAsncError(async(req,res,next)=>{
             patient.X_RayReport=data;
         }
     });
-    res.json({data:patient})
+    res.json({message:'success',data:patient,status:200});
+})
+/////////////////////////////////////////////////////////////
+export const viewAllPatient=catchAsncError(async(req,res,next)=>{
+    let currentPage=req.query.currentPage;
+    await Patient.find({},{updatedAt:0,createdAt:0,__v:0}).populate('user','-_id -confirmEmail -__v -role -password').then(async(data)=>{
+        let perPage=10;
+        let totalPatients;
+    let patients=  await Patient.find().countDocuments()
+    .then(count => {
+      totalPatients = count;
+      return Patient.find({},{updatedAt:0,createdAt:0,__v:0}).populate('user','-_id -confirmEmail -__v -role -password')
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+    });
+    res.json({message:'success',Patients:patients,status:200,totalPatients: totalPatients}) ;
+    })
+})
+/////////////////////////////////////////////////////////////////
+export const searchPatient=catchAsncError(async (req,res,next)=>{
+    let arrayOfPatient=[];
+    await Disease.find().populate('Patient').then(async(data)=>{
+        for(let i=0;i<data.length;i++){
+            await Patient.findById(data[i].Patient,{updatedAt:0,createdAt:0,__v:0}).populate('user','-_id -confirmEmail -__v -role -password')
+            .then((result)=>{
+                arrayOfPatient.push({Patient:result,Disease:data[i].Disease});
+            })
+        }
+        res.json({message:'success',Patients:arrayOfPatient,status:200}) ;
+    })
 })

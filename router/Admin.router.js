@@ -10,7 +10,7 @@ import { addRadiologist, DeleteRadiologist, findAllRadiologist, findOneRadiologi
 import { addEmployee, DeleteEmployee, findAllEmployee, findOneEmployee, UpdateEmployee } from '../controllers/Admin/EmployeeFunctional.controll.js';
 import { addAccountant, DeleteAccountant, findAllAccountant, findOneAccountant, UpdateAccountant } from '../controllers/Admin/AccountantFunctional.controller.js';
 import { addNurse, DeleteNurse, findAllNurse, findOneNurse, UpdateNurse } from '../controllers/Admin/NurseFunctional.controllers.js';
-import { addRoom, viewPatients } from '../controllers/Admin/adminFunctional.controller.js';
+import { addRoom, deleteRoom, updateRoom, viewAllRooms, viewPatients } from '../controllers/Admin/adminFunctional.controller.js';
 const AdminRouter =Router(); 
 AdminRouter.post('/AddDoctor',_auth,validation(AddDoctorValidate),authorAdmin,addDoctor);
 AdminRouter.get('/findAll',_auth,authorAdmin,findAll);
@@ -59,4 +59,7 @@ AdminRouter.post('/AddTiming',_auth,validation(AddTimingValidate),authorAdmin,ad
 AdminRouter.post('/addRoom',_auth,authorAdmin,addRoom);
 /////////////////////////////////////////////////////
 AdminRouter.get('/viewPatients',_auth,authorAdmin,viewPatients)
+AdminRouter.get('/viewAllRooms',_auth,authorAdmin,viewAllRooms);
+AdminRouter.put('/updateRoom',_auth,authorAdmin,updateRoom);
+AdminRouter.delete('/deleteRoom',_auth,authorAdmin,deleteRoom)
 export default AdminRouter;
