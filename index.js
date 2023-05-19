@@ -30,6 +30,9 @@ app.use((req,res,next)=>{
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(json());
 app.use(express.static('uploads'));
+app.use('/',(req,res)=>{
+    return res.json({message:'Welcom to Hospital Management System',status:200})
+})
 app.use('/user',userRouter);
 app.use('/Admin',AdminRouter);
 app.use('/Pharmacy',PharmacyRouter);

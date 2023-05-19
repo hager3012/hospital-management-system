@@ -9,4 +9,4 @@ RadiologistRouter.get('/viewX_RayReport',_auth,authorRadiologist,viewX_RayReport
 RadiologistRouter.get('/viewX_RayReportDetails',_auth,authorRadiologist,viewX_RayReportDetails);
 RadiologistRouter.delete('/deleteX_RayReport',_auth,authorRadiologist,deleteX_RayReport);
 RadiologistRouter.get('/viewPatient',_auth,authorRadiologist,viewPatient)
-export default RadiologistRouter;  
+export default RadiologistRouter;   
