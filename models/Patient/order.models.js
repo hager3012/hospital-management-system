@@ -8,10 +8,11 @@ const OrderSchema=new Schema({
     },
     products:[{
         name:{type:String,required:true},
-        price:{type:Number,default:1,required:true}
+        Price:{type:Number,default:1,required:true}
     }],
     finalPrice:{
         type:Number,
+        default:0,
         required:true
     },
     paymentType:{

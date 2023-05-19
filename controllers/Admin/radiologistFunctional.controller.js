@@ -7,6 +7,7 @@ import { X_RAY } from '../../models/CenterLab&radio/X-ray/X_RAY.models.js';
 import { Timing } from './../../models/Timing/Timing.models.js';
 import { Payment } from './../../models/Payment/Payment.models.js';
 import { radiologist } from './../../models/CenterLab&radio/X-ray/radiologist.models.js';
+
 export const addRadiologist=catchAsncError(async(req,res,next)=>{
   const {name,email,password,Mobile,Gender,DOB,Address,nameX_RayCenter,Days,Time,salary,role}=req.body;
   let Email=await userModel.findOne({email:email});

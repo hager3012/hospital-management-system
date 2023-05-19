@@ -53,7 +53,6 @@ export const  findOnePharmacist=catchAsncError( async(req,res,next)=>{
   let pharmacists=await pharmacist.findById(id,{__v:0}).populate('userId',' -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
     'Salary','-user -__v -createdAt -updatedAt -_id'
   )
-  console.log(pharmacists);
   if(pharmacists!=null){
     res.json({message:'success',pharmacist:pharmacists,status:200});
   }else{

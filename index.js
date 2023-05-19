@@ -1,5 +1,4 @@
 process.on('uncaughtException',(err)=>{
-    console.log('error not in express'+err);
 })
 import express, { json } from 'express';
 import cors from 'cors';
@@ -50,5 +49,4 @@ app.use((Errors, req, res, next) => {
 DBConnect(); 
 app.listen(process.env.PORT);
 process.on('unhandledRejection',(err)=>{
-    console.log('error not in express'+err);
 })

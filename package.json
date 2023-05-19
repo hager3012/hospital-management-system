@@ -1,11 +1,15 @@
 {
-  "name": "onlin-shop",
+  "name": "HMS",
   "version": "1.0.0",
-  "description": "onlin-shopping",
+  "description": "Hospital Management System",
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js"
+    "start": "node index.js",
+    "dev" :"nodemon index"
+  },
+  "engines": {
+    "node": "16.14.0"
   },
   "author": "hager",
   "license": "ISC",

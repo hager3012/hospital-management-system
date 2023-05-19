@@ -68,7 +68,7 @@ export const UpdateNurse= catchAsncError(async(req,res,next)=>{
   if(findNurse){
     await Timing.updateMany({_id:findNurse.Times},{Days,Time})
   await Payment.updateOne({_id:findNurse.Salary},{Salary:salary})
-    await userModel.findByIdAndUpdate(findNurse.userId,{name,Mobile,DOB,Address},{new:true})
+    await userModel.findByIdAndUpdate(findNurse.userId,{name,Mobile,Address},{new:true})
     let Nurses= await Nurse.findByIdAndUpdate(id,{Specialization},{new:true}).populate('userId','-_id -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
       'Salary','-user -__v -createdAt -updatedAt -_id'
     )

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { auth as _auth } from '../Middleware/user.auth.js';
 import {  authorPatient } from '../Middleware/author.js';
-import { BookDoctor, BookRoom, ViewAppointment, ViewDoctors, addMedicalHistory, cancelBookDoctor, cancelRoom, checkMedicalHistory, checkMedicine, patientInformation, searchDoctor, timeDetails, updateMedicalHistory, viewBookRoom, viewDisease, viewMedicalHistory, viewPrescription, viewRoom } from '../controllers/Patient/Patient.controllers.js';
+import { BookDoctor, BookRoom, ViewAppointment, ViewDoctors, addMedicalHistory, cancelBookDoctor, cancelRoom, checkMedicalHistory, checkMedicine, createOrder, patientInformation, searchDoctor, timeDetails, updateMedicalHistory, viewBookRoom, viewDisease, viewMedicalHistory, viewPrescription, viewRoom } from '../controllers/Patient/Patient.controllers.js';
 const PatientRouter =Router();
 PatientRouter.get('/ViewDoctors',_auth,authorPatient,ViewDoctors)
 PatientRouter.get('/searchDoctor',_auth,authorPatient,searchDoctor)
@@ -21,4 +21,5 @@ PatientRouter.delete('/cancelRoom',_auth,authorPatient,cancelRoom);
 PatientRouter.get('/viewBookRoom',_auth,authorPatient,viewBookRoom);
 PatientRouter.get('/patientInformation',_auth,authorPatient,patientInformation);
 PatientRouter.get('/viewDisease',_auth,authorPatient,viewDisease);
+PatientRouter.get('/createOrder',_auth,authorPatient,createOrder)
 export default PatientRouter;   

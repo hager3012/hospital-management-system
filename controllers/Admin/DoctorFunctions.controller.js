@@ -82,7 +82,6 @@ export const UpdateDoctor= catchAsncError(async(req,res,next)=>{
 export const DeleteDoctor= catchAsncError(async(req,res,next)=>{
   let id=req.query.DoctorID;
   let currentPage=req.query.currentPage;
-  console.log(id,currentPage);
   let DoctorOne=await Doctor.findById(id).populate('userId',' -confirmEmail -role -password -__v');
   if(DoctorOne){
     await Doctor.deleteOne({_id:id},{new:true}).populate('userId');
@@ -117,5 +116,4 @@ export const addTiming=catchAsncError(async(req,res,next)=>{
       })
       await Doctor.updateOne({_id:doctorID},{Times:idTime,confirmTiming:"-1"})
       res.json({message:'success',status:200})
-      console.log(doctorID);
 })

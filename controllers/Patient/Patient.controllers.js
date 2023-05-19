@@ -1,3 +1,4 @@
+import Stripe from "stripe";
 import { Doctor } from "../../models/Doctors/Doctors.models.js";
 import { bookingTime } from "../../models/Doctors/bookingTime.models.js";
 import { prescription } from "../../models/Doctors/prescription.models.js";
@@ -5,10 +6,12 @@ import { Patient } from "../../models/Patient/Patient.models.js";
 import { appointment } from "../../models/Patient/appointment.models.js";
 import { Disease } from "../../models/Patient/disease.models.js";
 import { medicalHistory } from "../../models/Patient/medicalHistory.models.js";
+import { Order } from "../../models/Patient/order.models.js";
 import { Medicine } from "../../models/Pharmancy/medicine.models.js";
 import { Room } from "../../models/rooms/room.model.js";
 import { userModel } from "../../models/user.model.js";
 import { AppError } from "../../util/AppError.js";
+import payment from "../../util/Payment.js";
 import { catchAsncError } from "../../util/catchAsncError.js";
 import { bookRoom } from './../../models/rooms/bookRoom.models.js';
 
@@ -48,22 +51,46 @@ export const BookDoctor=catchAsncError( async(req,res,next)=> {
     if(num===limit.limitRange){
       next(new AppError('Limit Range Completed Please Book another Time',422))
     }
-    else{
+    else{  
       let patient =await Patient.findOne({user:userID});
       await appointment.insertMany({Patient:patient._id,Doctor:doctorID,Date:DateAPI});
+      await Order.findOne({user:userID}).then(async(data)=>{
+        let arrayOfproduct=[];
+        let finalprice=0;
+        if(!data){
+          arrayOfproduct.push({name:'BookDoctor'+findDoctor.Specialization,
+          Price:50
+        })
+          await Order.insertMany({user:userID,products:arrayOfproduct,finalPrice:50})
+        }
+        else{
+          arrayOfproduct=data.products;
+          arrayOfproduct.push({name:'BookDoctor'+findDoctor.Specialization,
+          Price:50})
+          finalprice=data.finalPrice+50;
+          await Order.updateOne({user:userID},{products:arrayOfproduct,finalPrice:finalprice})
+        }
+        
+      })
       res.json({message:'success',status:200});
     }
 }) 
 ///////////////////////////////////////////////////////
 export const cancelBookDoctor=catchAsncError(async(req,res,next)=>{
-  let {doctorID,userID}=req.query;
-  let findDoctor=await Doctor.findById(doctorID);
-  if(!findDoctor){
-    return next(new AppError('Doctor is Not Found',422))
-  }
-  let patient =await Patient.findOne({user:userID});
-  await appointment.findOneAndDelete(({Patient:patient._id,Doctor:doctorID})).then((data)=>{
+  let {idAppointment}=req.query;
+  await appointment.findOneAndDelete(({_id:idAppointment})).then(async(data)=>{
     if(data){
+      await Order.findOne({user:req.userid}).then(async(result)=>{
+        let finalprice=result.finalPrice-50;
+        let arrayOfproduct=result.products;
+        for(let i=0;i<arrayOfproduct.length;i++){
+          if(arrayOfproduct[i].name==='BookDoctor'){
+            arrayOfproduct.splice(i,1)
+          }
+        }
+      await Order.updateOne({user:req.userid},{products:arrayOfproduct,finalPrice:finalprice}) 
+      })
+        
       res.json({message:'success',status:200})
     }
     else{
@@ -115,7 +142,6 @@ export const timeDetails =catchAsncError(async(req,res,next)=>{
     }else{
       return next(new AppError('No Time',422))
     }
-    console.log(data);
   })
 })
 ////////////////////////////////////////////////////////////////////////////
@@ -201,7 +227,26 @@ export const BookRoom=catchAsncError(async(req,res,next)=>{
     return next(new AppError('Patient Not Found',422))
   }
   await bookRoom.insertMany({Patient:patient._id,Room:roomID}).then(async()=>{
-    await Room.updateOne({_id:roomID,status:"true"});
+    await Room.findByIdAndUpdate(roomID,{status:"true"}).then(async(data)=>{
+      await Order.findOne({user:userID}).then(async(result)=>{
+        let arrayOfproduct=[];
+        let finalprice=0;
+        if(!result){
+          arrayOfproduct.push({name:'Book Room',
+          Price:data.price
+        })
+          await Order.insertMany({user:userID,products:arrayOfproduct,finalPrice:data.price})
+        }
+        else{
+          arrayOfproduct=result.products;
+          arrayOfproduct.push({name:'Book Room',
+          Price:data.price})
+          finalprice=result.finalPrice+data.price;
+          await Order.updateOne({user:userID},{products:arrayOfproduct,finalPrice:finalprice})
+        }
+        
+      })
+    });
     res.json({message:'success',status:200})
   })
 })
@@ -211,8 +256,19 @@ export const cancelRoom=catchAsncError(async(req,res,next)=>{
   if(!patient){
     return next(new AppError('Patient Not Found',422))
   }
-  await bookRoom.deleteOne({Patient:patient._id,Room:roomID}).then(async()=>{
-    await Room.updateOne({_id:roomID,status:"false"});
+  await bookRoom.deleteOne({Patient:patient._id,Room:roomID})
+      
+    await Room.findByIdAndUpdate(roomID,{status:"false"}).then(async(data)=>{
+      await Order.findOne({user:req.userid}).then(async(result)=>{
+        let finalprice=result.finalPrice-data.price;
+        let arrayOfproduct=result.products;
+        for(let i=0;i<arrayOfproduct.length;i++){
+          if(arrayOfproduct[i].name==='Book Room'){
+            arrayOfproduct.splice(i,1)
+          }
+        }
+      await Order.updateOne({user:req.userid},{products:arrayOfproduct,finalPrice:finalprice}) 
+    });
     res.json({message:'success',status:200})
   })
 })
@@ -256,4 +312,29 @@ export const viewDisease=catchAsncError(async(req,res,next)=>{
       res.json({message:'success',Disease:result.Disease,status:200})
     })
   })
+})
+//////////////////////////////////////////////////////////////////////
+export const createOrder=catchAsncError(async(req,res,next)=>{
+  let stripe = new Stripe(process.env.STRIP_KEY);
+  let order=await Order.findOne({user:req.userid});
+  let session =await payment({
+    stripe,
+    customer_email:req.userEmail,
+    metadata:{
+      orderId:order._id.toString()
+    },
+    line_items:order.products.map(product=>{
+      return {
+        price_data:{
+          currency:'EGP',
+          product_data:{
+            name:product.name
+          },
+          unit_amount:product.Price*100
+        },
+        quantity:1
+      }
+    })
+  })
+  res.json({message:'success',order,session,URL:session.url,status:200})
 })

@@ -36,7 +36,7 @@ export const SingnIn= catchAsncError(async(req,res,next)=>{
         return next(new AppError('incorrect in email or password',401))
     if(!user.confirmEmail)
         return next(new AppError('this user not confirm',401))     
-    let token=_generateSingin({name:user.name,role:user.role,id:user._id})
+    let token=_generateSingin({name:user.name,role:user.role,id:user._id,email:user.email})
     req.Token=token
     res.json({message:'success',Token:token,status:200});
 })
@@ -49,7 +49,6 @@ export const verifiy =catchAsncError(async(req,res,next)=>{
         else{
         await userModel.findOneAndUpdate({email:decoded.options},{confirmEmail:true});
         res.json({message:'success',status:200});
-        // res.connection.destroy();
         }
     });
     

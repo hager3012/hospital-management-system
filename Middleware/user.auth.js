@@ -10,6 +10,7 @@ export const auth=async(req,res,next)=>{
         }
         else{
             req.userid=decoded.id;
+            req.userEmail=decoded.email;
             next();
         }
     });

@@ -76,3 +76,10 @@ export const DeleteMedicine= catchAsncError(async(req,res,next)=>{
     next(new AppError('Medicine is Not Found',422))
   }
 })
+////////////////////////////////////////////////////////////////////
+export const searchMedicine=catchAsncError(async(req,res,next)=>{
+  await Medicine.find({},{__v:0,Medicine_quantity:0,exp_date:0,createdAt:0,updatedAt:0}).then((data)=>{
+    res.json({message:'success',Medicines:data,status:200}) ;
+  })
+});
+/////////////////////////////////////////////////////////////////
