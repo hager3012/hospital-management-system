@@ -286,7 +286,7 @@ export const createOrder=catchAsncError(async(req,res,next)=>{
           },
           unit_amount:product.Price*100
         },
-        quantity:1
+        quantity:product.quantity
       }
     })
   })
