@@ -262,3 +262,46 @@ export const searchPatient=catchAsncError(async (req,res,next)=>{
         res.json({message:'success',Patients:arrayOfPatient,status:200}) ;
     })
 })
+///////////////////////////////////////////////////////////////////////
+export const checkMedicalHistory=catchAsncError(async(req,res,next)=>{
+    let {PatientID}=req.query;
+    let patient=await Patient.findById(PatientID);
+    if(!patient){
+      return next(new AppError('Patient Not Found',422))
+    }
+    await medicalHistory.findOne({Patient:patient._id}).then((data)=>{
+      if(data){
+        res.json({message:'true',status:200})
+      }
+      else{
+        res.json({message:'false',status:200})
+      }
+    })
+  });
+////////////////////////////////////////////////////////
+export const addMedicalHistory=catchAsncError( async(req,res,next)=> {
+    let {PatientID}=req.query;
+    let {Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol}=req.body;
+    let patient=await Patient.findById(PatientID);
+    if(!patient){
+        return next(new AppError('Patient Not Add Medical History',422))
+    }
+    let History=await medicalHistory.findOne({Patient:patient._id});
+    if (History) {
+        return next(new AppError('Patient Add Medical History You Can Update it',422))
+    }
+    await medicalHistory.insertMany({Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol,Patient:patient._id})
+    res.json({message:'success',status:200})
+    })
+////////////////////////////////////////////////////////////////////////////
+export const updateMedicalHistory =catchAsncError(async(req,res,next)=>{
+    let {PatientID}=req.query; 
+    let {Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol}=req.body;
+    let patient=await Patient.findById(PatientID);
+      if(!patient){
+        return next(new AppError('Patient Not Add Medical History',422))
+      }
+      let data=await medicalHistory.findOneAndUpdate({Patient:patient._id},{Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol},{new:true});
+        res.json({message:'success',data,status:200})
+  });
+///////////////////////////////////////////////////////////////////  

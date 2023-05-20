@@ -19,7 +19,7 @@ export const addX_RayReport=catchAsncError(async(req,res,next)=>{
         }
         else{
             await X_RayReport.insertMany({type , path:req.file.filename ,price ,Patient:patientID, createdBy:req.userid}).then(async()=>{
-                await Order.findOne({user:data.user}).then(async(result)=>{
+                await Order.findOne({user:data.user,checkOut:false}).then(async(result)=>{
                     let arrayOfproduct=[];
                     let finalprice=0;
                     if(!result){
@@ -33,7 +33,7 @@ export const addX_RayReport=catchAsncError(async(req,res,next)=>{
                       arrayOfproduct.push({name:'X-Ray Report',
                       Price:Number(price)})
                       finalprice=result.finalPrice+Number(price);
-                      await Order.updateOne({user:data.user},{products:arrayOfproduct,finalPrice:finalprice})
+                      await Order.updateOne({user:data.user,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
                     }
                     
                   })
@@ -82,7 +82,7 @@ export const deleteX_RayReport=catchAsncError(async(req,res,next)=>{
             }
         });
         await Patient.findById({_id:reportOne.Patient}).then(async(data)=>{
-            await Order.findOne({user:data.user}).then(async(result)=>{
+            await Order.findOne({user:data.user,checkOut:false}).then(async(result)=>{
                 let finalprice=result.finalPrice-reportOne.price;
                 let arrayOfproduct=result.products;
                 for(let i=0;i<arrayOfproduct.length;i++){
@@ -90,7 +90,7 @@ export const deleteX_RayReport=catchAsncError(async(req,res,next)=>{
                     arrayOfproduct.splice(i,1)
                   }
                 }
-              await Order.updateOne({user:data.user},{products:arrayOfproduct,finalPrice:finalprice}) 
+              await Order.updateOne({user:data.user,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice}) 
             });
         }) 
       await X_RayReport.deleteOne({_id:reportID},{new:true})

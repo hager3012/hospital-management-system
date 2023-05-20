@@ -8,7 +8,8 @@ const OrderSchema=new Schema({
     },
     products:[{
         name:{type:String,required:true},
-        Price:{type:Number,default:1,required:true}
+        Price:{type:Number,default:1,required:true},
+        quantity:{type:Number,default:1,required:true}
     }],
     finalPrice:{
         type:Number,
@@ -19,6 +20,11 @@ const OrderSchema=new Schema({
         type:String,
         default:'cash',
         enum:['cash','card']
+    },
+    checkOut:{
+        type:Boolean,
+        default:false,
+        required:true
     }
 },{
     timestamps:true

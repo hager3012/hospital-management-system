@@ -6,13 +6,10 @@ const PatientBuyMedicineSchema=new Schema({
     ref:'user',
     required:true
   },
-  Medication:{
-    type:[],
-  },
-  checkOut:{
-    type:Boolean,
-    default:true,
-    required:true,
+  Prescription:{
+    type:mongoose.Types.ObjectId,
+    ref:'prescription',
+    required:true
   }
 },{
   timestamps:true

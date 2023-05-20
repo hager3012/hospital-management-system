@@ -14,6 +14,8 @@ import { AppError } from "../../util/AppError.js";
 import payment from "../../util/Payment.js";
 import { catchAsncError } from "../../util/catchAsncError.js";
 import { bookRoom } from './../../models/rooms/bookRoom.models.js';
+import { LabReport } from "../../models/CenterLab&radio/lab/LabReport.models.js";
+import { X_RayReport } from "../../models/CenterLab&radio/X-ray/X_RayReport.models.js";
 
 export const searchDoctor=catchAsncError( async(req,res,next)=> {
      await  Doctor.find({confirmTiming:"true"},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email Gender').populate({path:'Times'  }).then((response=>{
@@ -54,7 +56,7 @@ export const BookDoctor=catchAsncError( async(req,res,next)=> {
     else{  
       let patient =await Patient.findOne({user:userID});
       await appointment.insertMany({Patient:patient._id,Doctor:doctorID,Date:DateAPI});
-      await Order.findOne({user:userID}).then(async(data)=>{
+      await Order.findOne({user:userID,checkOut:false}).then(async(data)=>{
         let arrayOfproduct=[];
         let finalprice=0;
         if(!data){
@@ -68,7 +70,7 @@ export const BookDoctor=catchAsncError( async(req,res,next)=> {
           arrayOfproduct.push({name:'BookDoctor'+findDoctor.Specialization,
           Price:50})
           finalprice=data.finalPrice+50;
-          await Order.updateOne({user:userID},{products:arrayOfproduct,finalPrice:finalprice})
+          await Order.updateOne({user:userID,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
         }
         
       })
@@ -80,7 +82,7 @@ export const cancelBookDoctor=catchAsncError(async(req,res,next)=>{
   let {idAppointment}=req.query;
   await appointment.findOneAndDelete(({_id:idAppointment})).then(async(data)=>{
     if(data){
-      await Order.findOne({user:req.userid}).then(async(result)=>{
+      await Order.findOne({user:req.userid,checkOut:false}).then(async(result)=>{
         let finalprice=result.finalPrice-50;
         let arrayOfproduct=result.products;
         for(let i=0;i<arrayOfproduct.length;i++){
@@ -88,7 +90,7 @@ export const cancelBookDoctor=catchAsncError(async(req,res,next)=>{
             arrayOfproduct.splice(i,1)
           }
         }
-      await Order.updateOne({user:req.userid},{products:arrayOfproduct,finalPrice:finalprice}) 
+      await Order.updateOne({user:req.userid,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice}) 
       })
         
       res.json({message:'success',status:200})
@@ -118,21 +120,6 @@ export const ViewAppointment=catchAsncError( async(req,res,next)=> {
   })
   res.json({message:'success',Doctor:doctor,status:200})
   }) 
-  ////////////////////////////////////////////////////////
-  export const addMedicalHistory=catchAsncError( async(req,res,next)=> {
-    let userID=req.query.userID;
-    let {Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol}=req.body;
-    let patient =await Patient.findOne({user:userID});
-    if(!patient){
-      return next(new AppError('Patient Not Add Medical History',422))
-    }
-    let History=await medicalHistory.findOne({Patient:patient._id});
-    if (History) {
-      return next(new AppError('Patient Add Medical History You Can Update it',422))
-    }
-    await medicalHistory.insertMany({Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol,Patient:patient._id})
-    res.json({message:'success',status:200})
-    })
     /////////////////////////////////////////////////////////////////////////
 export const timeDetails =catchAsncError(async(req,res,next)=>{
   let doctorID=req.query.doctorID;
@@ -155,17 +142,7 @@ export const viewMedicalHistory =catchAsncError(async(req,res,next)=>{
       res.json({message:'success',data,status:200})
     })
 })
-////////////////////////////////////////////////////////////////////////////
-export const updateMedicalHistory =catchAsncError(async(req,res,next)=>{
-  let userID=req.query.userID; 
-  let {Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol}=req.body;
-  let patient =await Patient.findOne({user:userID});
-    if(!patient){
-      return next(new AppError('Patient Not Add Medical History',422))
-    }
-    let data=await medicalHistory.findOneAndUpdate({Patient:patient._id},{Conditions,symptoms,medication,allergies,tobacco,illegalDrugs,consumeAlcohol},{new:true});
-      res.json({message:'success',data,status:200})
-})
+
 ///////////////////////////////////////////////////
 export const viewPrescription=catchAsncError(async(req,res,next)=>{
   let userID=req.query.userID;
@@ -183,33 +160,7 @@ export const viewPrescription=catchAsncError(async(req,res,next)=>{
       res.json({message:'success',data,DoctorName:arrayOfPrescription,status:200})
   });
 })
-/////////////////////////////////////////////////
-export const checkMedicine=catchAsncError(async(req,res,next)=>{
-  let {medicine}=req.body;
-  await Medicine.findOne({Medicine_name:medicine}).then(data=>{
-    if(data){
-      res.json({message:'Found',status:200})
-    }else{
-      res.json({message:'NotFound',status:200})
-    }
-  })
-})
 /////////////////////////////////////////////////////////
-export const checkMedicalHistory=catchAsncError(async(req,res,next)=>{
-  let {userID}=req.query;
-  let patient=await Patient.findOne({user:userID});
-  if(!patient){
-    return next(new AppError('Patient Not Found',422))
-  }
-  await medicalHistory.findOne({Patient:patient._id}).then((data)=>{
-    if(data){
-      res.json({message:'true',status:200})
-    }
-    else{
-      res.json({message:'false',status:200})
-    }
-  })
-})
 export const viewRoom=catchAsncError(async(req,res,next)=>{
   await Room.find({status:"false"}).then((data)=>{
     if(data.length){
@@ -228,7 +179,7 @@ export const BookRoom=catchAsncError(async(req,res,next)=>{
   }
   await bookRoom.insertMany({Patient:patient._id,Room:roomID}).then(async()=>{
     await Room.findByIdAndUpdate(roomID,{status:"true"}).then(async(data)=>{
-      await Order.findOne({user:userID}).then(async(result)=>{
+      await Order.findOne({user:userID,checkOut:false}).then(async(result)=>{
         let arrayOfproduct=[];
         let finalprice=0;
         if(!result){
@@ -242,7 +193,7 @@ export const BookRoom=catchAsncError(async(req,res,next)=>{
           arrayOfproduct.push({name:'Book Room',
           Price:data.price})
           finalprice=result.finalPrice+data.price;
-          await Order.updateOne({user:userID},{products:arrayOfproduct,finalPrice:finalprice})
+          await Order.updateOne({user:userID,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
         }
         
       })
@@ -259,7 +210,7 @@ export const cancelRoom=catchAsncError(async(req,res,next)=>{
   await bookRoom.deleteOne({Patient:patient._id,Room:roomID})
       
     await Room.findByIdAndUpdate(roomID,{status:"false"}).then(async(data)=>{
-      await Order.findOne({user:req.userid}).then(async(result)=>{
+      await Order.findOne({user:req.userid,checkOut:false}).then(async(result)=>{
         let finalprice=result.finalPrice-data.price;
         let arrayOfproduct=result.products;
         for(let i=0;i<arrayOfproduct.length;i++){
@@ -267,7 +218,7 @@ export const cancelRoom=catchAsncError(async(req,res,next)=>{
             arrayOfproduct.splice(i,1)
           }
         }
-      await Order.updateOne({user:req.userid},{products:arrayOfproduct,finalPrice:finalprice}) 
+      await Order.updateOne({user:req.userid,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice}) 
     });
     res.json({message:'success',status:200})
   })
@@ -316,7 +267,10 @@ export const viewDisease=catchAsncError(async(req,res,next)=>{
 //////////////////////////////////////////////////////////////////////
 export const createOrder=catchAsncError(async(req,res,next)=>{
   let stripe = new Stripe(process.env.STRIP_KEY);
-  let order=await Order.findOne({user:req.userid});
+  let order=await Order.findOne({user:req.userid,checkOut:false});
+  if(!order){
+    return next(new AppError('you Not have oder yet',406))
+  }
   let session =await payment({
     stripe,
     customer_email:req.userEmail,
@@ -337,4 +291,44 @@ export const createOrder=catchAsncError(async(req,res,next)=>{
     })
   })
   res.json({message:'success',order,session,URL:session.url,status:200})
+});
+////////////////////////////////////////////////////////////////////////////
+export const viewLabReport=catchAsncError(async(req,res,next)=>{
+  await Patient.findOne({user:req.userid}).then(async(data)=>{
+    await LabReport.find({Patient:data._id},{Patient:0,__v:0}).populate('createdBy','name Gender email').then((result)=>{
+      res.json({message:'success',LabReport:result,status:200})
+    })
+  })
+})
+////////////////////////////////////////////////////////////////////////////
+export const viewX_RayReport=catchAsncError(async(req,res,next)=>{
+  await Patient.findOne({user:req.userid}).then(async(data)=>{
+    await X_RayReport.find({Patient:data._id},{Patient:0,__v:0}).populate('createdBy','name Gender email').then((result)=>{
+      res.json({message:'success',X_RayReport:result,status:200})
+    })
+  })
+});
+/////////////////////////////////////////////////////////////////////////
+export const payPatientBill=catchAsncError(async(req,res,next)=>{
+  let stripe = new Stripe(process.env.STRIP_KEY);
+  const sig = req.headers['stripe-signature'];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, process.env.ENDPOINTSECRET);
+  } catch (err) {
+    res.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  // Handle the event
+  let {orderId}=event.data.object.metadata
+  if (event.type =='checkout.session.completed') {
+    await Order.findByIdAndUpdate(orderId,{checkOut:true});
+    res.json({message:'success',status:200})
+  }
+  else{
+    res.json({message:'Rejected',status:400})
+  }
 })

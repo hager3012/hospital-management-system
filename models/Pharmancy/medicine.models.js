@@ -10,23 +10,10 @@ const MedicineSchema=new Schema({
         type:Number,
         required:true
     },
-    Medicine_type:{
-        type:String,
-        required:true
-    },
     Medicine_price:{
         type:Number,
         required:true,
-    },
-    exp_date:{
-        type:String,
-        required:true
-    },
-  Pharmacy:{
-    type:mongoose.Types.ObjectId,
-    ref:'Pharmacy',
-    required:true
-  }
+    }
 },{
   timestamps:true
 })

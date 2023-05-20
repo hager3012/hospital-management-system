@@ -15,6 +15,7 @@ import PatientRouter from './router/Patient.router.js';
 import NurseRouter from './router/Nurse.router.js';
 import LabratoriestRouter from './router/Lab.router.js';
 import RadiologistRouter from './router/X-ray.router.js';
+import AccountantRouter from './router/Accountant.router.js';
 dotenv.config();
 const app=express();
 app.use(helmet());
@@ -28,11 +29,17 @@ app.use((req,res,next)=>{
     next();
     }); 
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(json());
+app.use((req,res,next)=>{
+    console.log({url:req.originalUrl});
+    if(req.originalUrl=='/patient/webhook'){
+        next();
+    }
+    else{
+        express.json({})(req,res,next)
+    }
+});
 app.use(express.static('uploads'));
-app.use('/',(req,res)=>{
-    return res.json({message:'Welcom to Hospital Management System',status:200})
-})
+
 app.use('/user',userRouter);
 app.use('/Admin',AdminRouter);
 app.use('/Pharmacy',PharmacyRouter);
@@ -40,7 +47,11 @@ app.use('/Doctor',DoctorRouter) ;
 app.use('/Nurse',NurseRouter);
 app.use('/patient',PatientRouter) ;
 app.use('/Labratoriest',LabratoriestRouter);
-app.use('/Radiologist',RadiologistRouter)
+app.use('/Radiologist',RadiologistRouter);
+app.use('/Accountant',AccountantRouter);
+app.use('/',(req,res)=>{
+    return res.json({message:'Welcom to Hospital Management System',status:200})
+})
 app.all('*',(req,res,next)=>{
     next(new AppError("invalid url - can’t access this endPoind"+req.originalUrl,404))
 }) 

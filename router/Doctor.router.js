@@ -1,7 +1,9 @@
 import { Router } from 'express';
 import { auth as _auth } from '../Middleware/user.auth.js';
 import { authorDoctor } from '../Middleware/author.js';
-import { ViewAppointment, ViewTiming, addLimitRange, addPatientDisease, addPrescription, confirmTiming, deletePatientDisease, searchPatient, updatePrescription, viewAllPatient, viewMedicalHistory, viewPatientDetails, viewPrescription } from '../controllers/Doctor/Doctor.controllers.js';
+import { ViewAppointment, ViewTiming, addLimitRange, addMedicalHistory, addPatientDisease, addPrescription, checkMedicalHistory, confirmTiming, deletePatientDisease, searchPatient, updateMedicalHistory, updatePrescription, viewAllPatient, viewMedicalHistory, viewPatientDetails, viewPrescription } from '../controllers/Doctor/Doctor.controllers.js';
+import { viewReportForPatient } from '../controllers/Nurse/Nurse.controller.js';
+import { searchMedicine } from '../controllers/Pharmacy/Medicine.controller.js';
 const DoctorRouter =Router();
 DoctorRouter.post('/confirmTiming',_auth,authorDoctor,confirmTiming)
 DoctorRouter.get('/ViewTiming',_auth,authorDoctor,ViewTiming)
@@ -16,4 +18,9 @@ DoctorRouter.get('/viewMedicalHistory',_auth,authorDoctor,viewMedicalHistory);
 DoctorRouter.get('/viewPatientDetails',_auth,authorDoctor,viewPatientDetails);
 DoctorRouter.get('/viewAllPatient',_auth,authorDoctor,viewAllPatient);
 DoctorRouter.get('/searchPatient',_auth,authorDoctor,searchPatient);
+DoctorRouter.get('/checkMedicalHistory',_auth,authorDoctor,checkMedicalHistory);
+DoctorRouter.post('/addMedicalHistory',_auth,authorDoctor,addMedicalHistory);
+DoctorRouter.put('/updateMedicalHistory',_auth,authorDoctor,updateMedicalHistory);
+DoctorRouter.get('/viewReportForPatient',_auth,authorDoctor,viewReportForPatient);
+DoctorRouter.get('/getAllMedicines',_auth,authorDoctor,searchMedicine);
 export default DoctorRouter;   

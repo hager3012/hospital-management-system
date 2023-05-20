@@ -3,12 +3,18 @@ import { catchAsncError } from '../../util/catchAsncError.js';
 import { AppError } from '../../util/AppError.js';
 import { Pharmacy } from '../../models/Pharmancy/Pharmacy.models.js';
 import { Medicine } from './../../models/Pharmancy/medicine.models.js';
+import { prescription } from './../../models/Doctors/prescription.models.js';
+import { Patient } from './../../models/Patient/Patient.models.js';
+import { PatientBuyMedicine } from '../../models/Pharmancy/PatientBuyMedicine.models.js';
+import { Doctor } from './../../models/Doctors/Doctors.models.js';
+import { userModel } from '../../models/user.model.js';
+import { Order } from '../../models/Patient/order.models.js';
 export const addMedicine=catchAsncError(async(req,res,next)=>{
-    const {Medicine_name,Medicine_quantity,Medicine_type,Medicine_price,exp_date}=req.body;
+    const {Medicine_name,Medicine_quantity,Medicine_price}=req.body;
     let Medicines=await Medicine.findOne({Medicine_name:Medicine_name});
     if(!Medicines){
-        let {id}=await Pharmacy.findOne({name:'HMS Pharmacy'});
-        await Medicine.insertMany({Medicine_name,Medicine_quantity,Medicine_type,Medicine_price,exp_date,Pharmacy:id});
+
+        await Medicine.insertMany({Medicine_name,Medicine_quantity,Medicine_price,});
         res.json({message:'success',status:200})
     }
     else{
@@ -38,13 +44,12 @@ export const  findOne=catchAsncError( async(req,res,next)=>{
 // //////////////////////////////////////
 export const UpdateMedicine= catchAsncError(async(req,res,next)=>{
   const id=req.query.MedicineID; 
-  const {Medicine_name,Medicine_quantity,Medicine_type,Medicine_price,exp_date}=req.body;
+  const {Medicine_name,Medicine_quantityMedicine_price}=req.body;
   // this new for find after update without new return before update
   const findMedicine=await Medicine.findById(id);
   if(findMedicine){
-    let {_id}=await Pharmacy.findOne({name:'HMS Pharmacy'});
-    let Medicines= await Medicine.findByIdAndUpdate(id,{Medicine_name,Medicine_quantity,Medicine_type,Medicine_price,exp_date,Pharmacy:_id} ,{new:true})
-    res.json({message:'success',Medicinea:Medicines,status:200});
+    let Medicines= await Medicine.findByIdAndUpdate(id,{Medicine_name,Medicine_quantityMedicine_price} ,{new:true})
+    res.json({message:'success',Medicine:Medicines,status:200});
   }
   else{
     next(new AppError('Medicine is Not Found',422))
@@ -83,3 +88,59 @@ export const searchMedicine=catchAsncError(async(req,res,next)=>{
   })
 });
 /////////////////////////////////////////////////////////////////
+export const viewPatient=catchAsncError(async(req,res,next)=>{
+  let arrayOfPatient=[];
+  await prescription.find().populate('doctor','userId Specialization').then(async(data)=>{
+    for(let i=0;i<data.length;i++){
+      if(data[i].Medication.length>0){
+        await PatientBuyMedicine.findOne({Prescription:data[i]._id}).then(async(result)=>{
+          if(!result){
+            let doctor=await userModel.findById(data[i].doctor.userId)
+            await Patient.findById(data[i].Patient).populate('user','-password -role -Address -confirmEmail -__v').then((result)=>{
+              arrayOfPatient.push({NameOfDoctor:doctor.name,SpecializationDoctor:data[i].doctor.Specialization,prescriptionId:data[i]._id,user:result.user,Medication:data[i].Medication})
+            })
+          }
+        })
+      }
+    }
+  })
+  res.json({message:'success',Patients:arrayOfPatient,status:200}) ;
+});
+////////////////////////////////////////////////////////////////////
+export const buyMedicine=catchAsncError(async(req,res,next)=>{
+  let patientId=req.query.patientId;
+  let {nameMedicine,quantity}=req.body;
+  let medicine=await Medicine.findOne({Medicine_name:nameMedicine});
+  let user=await Patient.findById(patientId);
+  await Order.findOne({user:user._id,checkOut:false}).then(async(result)=>{
+    let arrayOfproduct=[];
+    let finalprice=0;
+    if(!result){
+      arrayOfproduct.push({name:'Buy medicine '+nameMedicine,
+      Price:medicine.Medicine_price,
+      quantity:quantity
+    })
+      await Order.insertMany({user:user._id,products:arrayOfproduct,finalPrice:medicine.Medicine_price*quantity})
+    }
+    else{
+      arrayOfproduct=result.products;
+      arrayOfproduct.push({name:'Buy medicine '+nameMedicine,
+      Price:medicine.Medicine_price,
+      quantity:quantity
+    })
+      finalprice=result.finalPrice+medicine.Medicine_price*quantity;
+      await Order.updateOne({user:user._id,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
+    }
+    
+  })
+  await Medicine.updateOne({Medicine_name:nameMedicine},{$inc: { Medicine_quantity: -quantity }}).then(()=>{
+    res.json({message:'success',status:200}) ;
+  })
+});
+/////////////////////////////////////////////////////////////////////
+export const finishBuy=catchAsncError(async(req,res,next)=>{
+  let PrescriptionId=req.query.PrescriptionId;
+  await PatientBuyMedicine.insertMany({user:req.userid,Prescription:PrescriptionId}).then(()=>{
+    res.json({message:'success',status:200}) ;
+  })
+})
