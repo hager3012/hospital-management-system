@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 const Schema =mongoose.Schema;
 const NurseSchema=new Schema({
-  Specialization:{
-    type:String,
-    required:true
-  },
   userId:{
     type:mongoose.Types.ObjectId,
     ref:'user',

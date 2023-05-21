@@ -7,7 +7,7 @@ import { Timing } from './../../models/Timing/Timing.models.js';
 import { Payment } from './../../models/Payment/Payment.models.js';
 import { Nurse } from '../../models/Nurse/Nurse.models.js';
 export const addNurse=catchAsncError(async(req,res,next)=>{
-  const {name,email,password,Mobile,Gender,DOB,Address,Specialization,Days,Time,salary,role}=req.body;
+  const {name,email,password,Mobile,Gender,DOB,Address,Days,Time,salary,role}=req.body;
   let Email=await userModel.findOne({email:email});
   if(!Email){
     let idTime,idSalary,idUser;
@@ -21,7 +21,7 @@ export const addNurse=catchAsncError(async(req,res,next)=>{
       await Payment.insertMany({Salary:salary}).then((data)=>{
         idSalary=data[0]._id;
       });
-      await Nurse.insertMany({Specialization,userId:idUser,Salary:idSalary,Times:idTime})
+      await Nurse.insertMany({userId:idUser,Salary:idSalary,Times:idTime})
       _sendMail(email,role,password); 
       res.json({message:'success',status:200})
     }) 
@@ -62,14 +62,14 @@ export const  findOneNurse=catchAsncError( async(req,res,next)=>{
 // //////////////////////////////////////
 export const UpdateNurse= catchAsncError(async(req,res,next)=>{
   const id=req.query.NurseID;
-  const {name,Mobile,Address,Specialization,Days,Time,salary}=req.body;
+  const {name,Mobile,Address,Days,Time,salary}=req.body;
   // this new for find after update without new return before update
   const findNurse=await Nurse.findById(id);
   if(findNurse){
     await Timing.updateMany({_id:findNurse.Times},{Days,Time})
   await Payment.updateOne({_id:findNurse.Salary},{Salary:salary})
     await userModel.findByIdAndUpdate(findNurse.userId,{name,Mobile,Address},{new:true})
-    let Nurses= await Nurse.findByIdAndUpdate(id,{Specialization},{new:true}).populate('userId','-_id -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
+    let Nurses= await Nurse.findById(id).populate('userId','-_id -confirmEmail -role -password -__v').populate('Times','-user -__v -createdAt -updatedAt -_id').populate(
       'Salary','-user -__v -createdAt -updatedAt -_id'
     )
   
