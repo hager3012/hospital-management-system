@@ -1,22 +1,18 @@
 import { createTransport } from "nodemailer";
-import{userRestPasswordHTML} from './userRestPassword.html'
-import  jwt from 'jsonwebtoken'
-import dotenv from 'dotenv';
-dotenv.config();
-export async function sendMail(options) {
+import{userRestPasswordHTML} from './userRestPassword.html.js'
+export async function sendMail(code,email) {
 
     let transporter = createTransport({
         service: 'gmail',
         auth: {
-            user: 'hagershaaban7@gmail.com',
-            pass: 'piuzrzeaegecmplz', // generated ethereal password
+            user: 'hmsytem65@gmail.com',
+            pass: 'gqvvhquecasoxvks', // generated ethereal password
         },
     });
-    let token =jwt.sign({options},process.env.JWT_KEY) 
     let info = await transporter.sendMail({
-        from: '"HMS" <hagershaaban7@gmail.com>',
-        to: options,
-        subject: "[HMS] Please verify your Email ",
-        html: userRestPasswordHTML(token)
+        from: '"HMS" <hmsytem65@gmail.com>',
+        to: email,
+        subject: "[HMS] Rest Password ",
+        html: userRestPasswordHTML(code)
     });
 }

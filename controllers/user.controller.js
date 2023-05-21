@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import { customAlphabet, nanoid } from 'nanoid'
 dotenv.config();
 import { hash as _hash, compare } from 'bcrypt';
 import { generateSingin as _generateSingin } from '../util/generateSingin.js';
@@ -8,6 +9,7 @@ import { catchAsncError } from "../util/catchAsncError.js";
 import  jwt  from 'jsonwebtoken';
 import { AppError } from '../util/AppError.js';
 import { Patient } from '../models/Patient/Patient.models.js';
+import { sendMail } from '../emails/userRestPassword.email.js';
 export const SingnUp= catchAsncError(async(req,res,next)=>{
     let {name,email,password,role,Mobile,Gender,DOB,Address}=req.body;
     let Email=await userModel.findOne({email:email});
@@ -52,4 +54,30 @@ export const verifiy =catchAsncError(async(req,res,next)=>{
         }
     });
     
+});
+////////////////////////////////////////////////////////////////////////
+export const sendCode=catchAsncError(async(req,res,next)=>{
+let {email}=req.body;
+let nanoId=customAlphabet('123456789',5);
+let code=nanoId();
+await userModel.findOneAndUpdate({email},{forgetCode:code}).then((data)=>{
+    if(!data){
+        return next(new AppError('Not Register account',404))
+    }
+    sendMail(code,email);
+    res.json({message:'success',status:200});
 })
+});
+////////////////////////////////////////////////////////////////////////
+export const restPassword=catchAsncError(async(req,res,next)=>{
+    let {email,code,newPassword}=req.body;
+    _hash(newPassword, Number(process.env.ROUND), async function(err, hash) {
+        await userModel.findOneAndUpdate({email,forgetCode:code},{password:hash}).then(async(data)=>{
+            if(!data){
+                return next(new AppError('code or email are invalid ',404))
+            }
+            await userModel.findOneAndUpdate({email},{forgetCode:null});
+            res.json({message:'success',status:200});
+        })
+    })
+    });

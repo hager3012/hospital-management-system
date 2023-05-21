@@ -39,6 +39,10 @@ const user=new Schema({
     confirmEmail:{
         type:Boolean,
         default:false
+    },
+    forgetCode:{
+        type:Number,
+        default:null
     }
 });
 export const userModel=mongoose.model('user',user);

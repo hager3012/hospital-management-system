@@ -30,7 +30,6 @@ app.use((req,res,next)=>{
     }); 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use((req,res,next)=>{
-    console.log({url:req.originalUrl});
     if(req.originalUrl=='/patient/webhook'){
         next();
     }

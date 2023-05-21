@@ -4,6 +4,7 @@ import { bookRoom } from "../../models/rooms/bookRoom.models.js";
 import { userModel } from "../../models/user.model.js";
 import { AppError } from "../../util/AppError.js";
 import { catchAsncError } from "../../util/catchAsncError.js";
+import { prescription } from './../../models/Doctors/prescription.models.js';
 
 export const viewPatients=catchAsncError(async(req,res,next)=>{
     let arrayOfPatient=[];
@@ -79,3 +80,24 @@ export const viewReportForPatient=catchAsncError(async(req,res,next)=>{
         
     })
 });
+///////////////////////////////////////////////////////////////
+export const viewMedication=catchAsncError(async(req,res,next)=>{
+    let patientID=req.query.patientID;
+    let medication=[];
+    await prescription.find({Patient:patientID}).populate('Patient').populate('doctor').then(async(data)=>{
+        if(!data){
+            return next(new AppError('this patient Not have prescription',426))
+        }
+        for(let i=0;i<data.length;i++){
+            data[i].Medication.map(item=>{
+                item.times="every "+24/item.times +" hours"
+            })
+            let user=await userModel.findById(data[i].Patient.user,{name:1});
+            let doctorc=await userModel.findById(data[i].doctor.userId,{name:1})
+            data[i].Patient=user
+            data[i].doctor=doctorc
+            medication.push(data[i])
+        }
+        res.json({message:'success',medication,status:200}) ;
+    })
+})

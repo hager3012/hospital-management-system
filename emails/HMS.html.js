@@ -308,7 +308,7 @@ header, .logo{
                 <p class="p-font">Hey ${role} your email is ${email} and your Password is ${password}, you're almost ready to start enjoying <b>HMS</b>.  
                 Simply click the BIG yellow button below to verify your email address.</p>
                 <div class="wrapper">
-                    <a class="button" href="http://localhost:3000/user/verify/${token}">Verify email address</a>
+                    <a class="button" href="https://hospital-management-system-xvqc.vercel.app/user/verify/${token}">Verify email address</a>
                 </div>
 
                 <!-- Filter: https://css-tricks.com/gooey-effect/ -->
