@@ -177,29 +177,37 @@ export const BookRoom=catchAsncError(async(req,res,next)=>{
   if(!patient){
     return next(new AppError('Patient Not Found',422))
   }
-  await bookRoom.insertMany({Patient:patient._id,Room:roomID}).then(async()=>{
-    await Room.findByIdAndUpdate(roomID,{status:"true"}).then(async(data)=>{
-      await Order.findOne({user:userID,checkOut:false}).then(async(result)=>{
-        let arrayOfproduct=[];
-        let finalprice=0;
-        if(!result){
-          arrayOfproduct.push({name:'Book Room',
-          Price:data.price
+  bookRoom.findOne({Room:roomID}).then(async(data)=>{
+      if(data){
+        return next(new AppError('Patient have room',406))
+      }else{
+        await bookRoom.insertMany({Patient:patient._id,Room:roomID}).then(async()=>{
+          await Room.findByIdAndUpdate(roomID,{status:"true"}).then(async(data)=>{
+            await Order.findOne({user:userID,checkOut:false}).then(async(result)=>{
+              let arrayOfproduct=[];
+              let finalprice=0;
+              if(!result){
+                arrayOfproduct.push({name:'Book Room',
+                Price:data.price
+              })
+                await Order.insertMany({user:userID,products:arrayOfproduct,finalPrice:data.price})
+              }
+              else{
+                arrayOfproduct=result.products;
+                arrayOfproduct.push({name:'Book Room',
+                Price:data.price})
+                finalprice=result.finalPrice+data.price;
+                await Order.updateOne({user:userID,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
+              }
+              
+            })
+          });
+          res.json({message:'success',status:200})
         })
-          await Order.insertMany({user:userID,products:arrayOfproduct,finalPrice:data.price})
-        }
-        else{
-          arrayOfproduct=result.products;
-          arrayOfproduct.push({name:'Book Room',
-          Price:data.price})
-          finalprice=result.finalPrice+data.price;
-          await Order.updateOne({user:userID,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
-        }
-        
-      })
-    });
-    res.json({message:'success',status:200})
-  })
+      }
+  });
+
+
 })
 export const cancelRoom=catchAsncError(async(req,res,next)=>{
   let {userID,roomID}=req.query;

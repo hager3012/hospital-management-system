@@ -15,12 +15,26 @@ export const addRoom=catchAsncError(async(req,res,next)=>{
         next(new AppError('Failed',422));
     })
 })
-export const viewPatients=catchAsncError(async(req,res,next)=>{
-    await Patient.find({},{__v:0,createdAt:0,updatedAt:0}).populate('user','name Mobile Gender').then((data)=>{
+export const searchPatient=catchAsncError(async(req,res,next)=>{
+    await Patient.find({},{__v:0,createdAt:0,updatedAt:0}).populate('user','name email Mobile Gender').then((data)=>{
         res.json({message:'success',data,status:200})
     })
 })
 //////////////////////////////////////////////////////////////////////////////
+export const viewPatient=catchAsncError( async(req,res,next)=> {
+    const {currentPage} = req.query || 1;
+    const perPage = 10;
+    let totalItems;
+    let patients=  await Patient.find().countDocuments()
+    .then(count => {
+      totalItems = count;
+      return Patient.find({},{__v:0,createdAt:0,updatedAt:0}).populate('user','name email Mobile Gender')
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+    });
+    res.json({message:'success',Patients:patients,status:200,totalPatient: totalItems})
+      })
+/////////////////////////////////////////////////////////////////////////////
 export const viewAllRooms=catchAsncError(async(req,res,next)=>{
     let currentPage=req.query.currentPage;
     await Room.find().then(async(data)=>{

@@ -70,6 +70,34 @@ export const ViewAppointment=catchAsncError( async(req,res,next)=> {
         for(let i=0;i<data.length;i++){
             let patient=await Patient.findById(data[i].Patient,{__v:0,createdAt:0,updatedAt:0, _id:0}).populate('user','name DOB -_id');
             Time.push({Appointment:data[i],Patient:patient.user});
+            ////// Prescription For Patient
+            let PrescriptionForPatient=await prescription.findOne({Patient:data[i].Patient});
+            if(PrescriptionForPatient){
+                Time[i].Prescription=true;
+            }else{
+                Time[i].Prescription=false;
+            }
+            // medical History For Patient
+            let medicalHistoryForPatient=medicalHistory.findOne({Patient:data[i].Patient});
+            if(medicalHistoryForPatient){
+                Time[i].medicalHistory=true;
+            }else{
+                Time[i].medicalHistory=false;
+            }
+            ///////// Lab report 
+            let LabReportForPatien=LabReport.findOne({Patient:data[i].Patient});
+            if(LabReportForPatien){
+                Time[i].LabReport=true;
+            }else{
+                Time[i].LabReport=false;
+            }
+            ///////////// X-Ray Report
+            let X_RayReortForPatient=X_RayReport.findOne({Patient:data[i].Patient});
+            if(X_RayReortForPatient){
+                Time[i].X_RayReport=true;
+            }else{
+                Time[i].X_RayReport=false;
+            }
         }
         
     })
@@ -194,42 +222,42 @@ export const viewPatientDetails =catchAsncError(async(req,res,next)=>{
         if(data){
             doctorID=data._id;
             await appointment.find({Patient:patientID,Doctor:data._id},{_id:0,Patient:0,Doctor:0,__v:0}).then((result)=>{
-                if(result.length!=0){
+                
                     patient.appointments=result;
-                }
+                
                 
             })
         }
     });
     await bookRoom.findOne({Patient:patientID}).populate('Room','-__v -_id').then((data)=>{
-        if(data){
-            patient.Room=data.Room;
-        }
+        
+            patient.Room=data;
+        
     });
     await Disease.findOne({Patient:patientID},{Disease:1,_id:0}).then((data)=>{
-        if(data.Disease.length!=0){
-            patient.Disease=data.Disease
-        }
+        
+            patient.Disease=data
+        
     })
     await LabReport.find({Patient:patientID},{__v:0,_id:0,Patient:0}).populate('createdBy','Gender name email Mobile').then((data)=>{
-        if(data.length!=0){
+        
             patient.LabReport=data;
-        }
+        
     });
     await medicalHistory.findOne({Patient:patientID},{__v:0,_id:0,Patient:0}).then((data)=>{
-        if(data){
+        
             patient.medicalHistory=data;
-        }
+        
     });
     await prescription.find({doctor:userID,Patient:patientID},{Patient:0,doctor:0,_id:0}).then((data)=>{
-        if(data.length!=0){
+        
             patient.prescription=data;
-        }
+        
     })
     await X_RayReport.find({Patient:patientID},{__v:0,_id:0,Patient:0}).populate('createdBy','Gender name email Mobile').then((data)=>{
-        if(data.length!=0){
+        
             patient.X_RayReport=data;
-        }
+        
     });
     res.json({message:'success',data:patient,status:200});
 })

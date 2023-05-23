@@ -29,18 +29,12 @@ export const findAll=catchAsncError( async(req,res,next)=> {
   let Medicines=  await Medicine.find().countDocuments()
   .then(count => {
     totalItems = count;
-    return Medicine.find({},{__v:0,Medicine_quantity:0,exp_date:0,createdAt:0,updatedAt:0}).populate('Pharmacy','-_id')
+    return Medicine.find({},{__v:0,createdAt:0,updatedAt:0})
       .skip((currentPage - 1) * perPage)
       .limit(perPage);
   });
   res.json({message:'success',Medicines:Medicines,status:200,totalItems: totalItems})
     })
-// ///////////////////////////////////////
-export const  findOne=catchAsncError( async(req,res,next)=>{
-  let id=req.query.MedicineID;
-  let Medicines=await Medicine.findById(id,{__v:0}).populate('Pharmacy','-_id')
-  res.json({message:'success',Medicines:Medicines,status:200});
-})
 // //////////////////////////////////////
 export const UpdateMedicine= catchAsncError(async(req,res,next)=>{
   const id=req.query.MedicineID; 
@@ -83,7 +77,7 @@ export const DeleteMedicine= catchAsncError(async(req,res,next)=>{
 })
 ////////////////////////////////////////////////////////////////////
 export const searchMedicine=catchAsncError(async(req,res,next)=>{
-  await Medicine.find({},{__v:0,Medicine_quantity:0,exp_date:0,createdAt:0,updatedAt:0}).then((data)=>{
+  await Medicine.find({},{__v:0,createdAt:0,updatedAt:0}).then((data)=>{
     res.json({message:'success',Medicines:data,status:200}) ;
   })
 });

@@ -48,8 +48,15 @@ app.use('/patient',PatientRouter) ;
 app.use('/Labratoriest',LabratoriestRouter);
 app.use('/Radiologist',RadiologistRouter);
 app.use('/Accountant',AccountantRouter);
-app.use('/',(req,res)=>{
-    return res.json({message:'Welcom to Hospital Management System',status:200})
+app.use('/',(req,res,next)=>{
+    if(req.originalUrl=='/'){
+        return res.json({message:'Welcom to Hospital Management System',status:200})
+        
+    }
+    else{
+        next();
+    }
+    
 })
 app.all('*',(req,res,next)=>{
     next(new AppError("invalid url - can’t access this endPoind"+req.originalUrl,404))

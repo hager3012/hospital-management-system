@@ -113,28 +113,24 @@ export const deleteReport=catchAsncError(async(req,res,next)=>{
 })
 ///////////////////////////////////////////////////////////////////////
 export const viewPatient=catchAsncError(async(req,res,next)=>{
-    let arrayOfPatientHaveReport=[];
-    let arrayOfLab=[]
-    await prescription.find().then(async(data)=>{
-        for(let i=0;i<data.length;i++){
-            if(data[i].Lab.length){
-                await Patient.findById(data[i].Patient).populate('user','-_id name email Gender Mobile DOB').then((result)=>{
-                    let birthdate = new Date(result.user.DOB);
-                    let today=new Date();
-                        let age = today.getFullYear() - birthdate.getFullYear() - 
-                        (today.getMonth() < birthdate.getMonth() || 
-                        (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
-                        result.user.DOB=age;
-                        for(let j=0;j<data[i].Lab.length;j++){
-                            if(data[i].Lab[j].analysis!=""){
-                                arrayOfLab.push(data[i].Lab[j].analysis)
-                            }
-                        }
-                    arrayOfPatientHaveReport.push({result,Lab:arrayOfLab})
-                    arrayOfLab=[];
-                })
-            }
-        }
-    })
-    res.json({message:'success',Patient:arrayOfPatientHaveReport,status:200}) ;
+  let arrayOfPatientHaveReport=[];
+  
+  await prescription.find().then(async(data)=>{
+      for(let i=0;i<data.length;i++){
+          if(data[i].Lab.length){
+              await Patient.findById(data[i].Patient).populate('user','-_id name email Gender Mobile DOB').then((result)=>{
+                  let birthdate = new Date(result.user.DOB);
+                  let today=new Date();
+                      let age = today.getFullYear() - birthdate.getFullYear() - 
+                      (today.getMonth() < birthdate.getMonth() || 
+                      (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
+                      result.user.DOB=age;
+                     
+                  arrayOfPatientHaveReport.push({result,Lab:data[i].Lab})
+                  
+              })
+          }
+      }
+  })
+  res.json({message:'success',Patient:arrayOfPatientHaveReport,status:200}) ;
 })
