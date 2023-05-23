@@ -9,6 +9,7 @@ import fs from 'fs';
 import { Order } from "../../models/Patient/order.models.js";
 export const addX_RayReport=catchAsncError(async(req,res,next)=>{
     let patientID=req.query.patientID;
+    let prescriptionID=req.query.prescriptionId;
     let {type, price}=req.body;
     if(!req.file){
         return next(new AppError('send report only'),406);
@@ -18,7 +19,7 @@ export const addX_RayReport=catchAsncError(async(req,res,next)=>{
             return next(new AppError('Patient Not Found',406))
         }
         else{
-            await X_RayReport.insertMany({type , path:req.file.filename ,price ,Patient:patientID, createdBy:req.userid}).then(async()=>{
+            await X_RayReport.insertMany({type , path:req.file.filename ,price ,Patient:patientID, createdBy:req.userid,prescription:prescriptionID}).then(async()=>{
                 await Order.findOne({user:data.user,checkOut:false}).then(async(result)=>{
                     let arrayOfproduct=[];
                     let finalprice=0;

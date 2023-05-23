@@ -303,7 +303,14 @@ export const createOrder=catchAsncError(async(req,res,next)=>{
 ////////////////////////////////////////////////////////////////////////////
 export const viewLabReport=catchAsncError(async(req,res,next)=>{
   await Patient.findOne({user:req.userid}).then(async(data)=>{
-    await LabReport.find({Patient:data._id},{Patient:0,__v:0}).populate('createdBy','name Gender email').then((result)=>{
+    await LabReport.find({Patient:data._id},{Patient:0,__v:0}).populate('createdBy','name Gender email')
+    .populate('prescription','doctor').then(async(result)=>{
+      for(let i=0;i<result.length;i++){
+        await Doctor.findById(result[i].prescription.doctor,{Specialization:1,userId:1}).populate('userId','name email Gender DOB').then((doctorData)=>{
+            result[i].prescription.doctor=doctorData
+        })
+      }
+      
       res.json({message:'success',LabReport:result,status:200})
     })
   })
@@ -311,10 +318,16 @@ export const viewLabReport=catchAsncError(async(req,res,next)=>{
 ////////////////////////////////////////////////////////////////////////////
 export const viewX_RayReport=catchAsncError(async(req,res,next)=>{
   await Patient.findOne({user:req.userid}).then(async(data)=>{
-    await X_RayReport.find({Patient:data._id},{Patient:0,__v:0}).populate('createdBy','name Gender email').then((result)=>{
-      res.json({message:'success',X_RayReport:result,status:200})
-    })
+    await X_RayReport.find({Patient:data._id},{Patient:0,__v:0}).populate('createdBy','name Gender email')
+    .populate('prescription','doctor').then(async(result)=>{
+      for(let i=0;i<result.length;i++){
+        await Doctor.findById(result[i].prescription.doctor,{Specialization:1,userId:1}).populate('userId','name email Gender DOB').then((doctorData)=>{
+            result[i].prescription.doctor=doctorData
+        })
+      }
+    res.json({message:'success',X_RayReport:result,status:200})
   })
+})
 });
 /////////////////////////////////////////////////////////////////////////
 export const payPatientBill=catchAsncError(async(req,res,next)=>{

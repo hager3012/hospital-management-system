@@ -251,8 +251,12 @@ export const viewPatientDetails =catchAsncError(async(req,res,next)=>{
             patient.medicalHistory=data;
         
     });
-    await prescription.find({doctor:userID,Patient:patientID},{Patient:0,doctor:0,_id:0}).then((data)=>{
-        
+    await prescription.find({doctor:doctorID,Patient:patientID},{Patient:0,_id:0}).populate('doctor','userId').then(async(data)=>{
+        for(let i=0;i<data.length;i++){
+            await userModel.findById(data[i].doctor.userId,{name:1,email:1,Gender:1}).then((result)=>{
+                data[i].doctor=result;
+            })
+        }
             patient.prescription=data;
         
     })

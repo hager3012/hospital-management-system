@@ -105,7 +105,7 @@ export const buyMedicine=catchAsncError(async(req,res,next)=>{
   let patientId=req.query.patientId;
   let {nameMedicine,quantity}=req.body;
   let medicine=await Medicine.findOne({Medicine_name:nameMedicine});
-  let user=await Patient.findById(patientId);
+  let user=await Patient.findOne({user:patientId});
   await Order.findOne({user:user._id,checkOut:false}).then(async(result)=>{
     let arrayOfproduct=[];
     let finalprice=0;

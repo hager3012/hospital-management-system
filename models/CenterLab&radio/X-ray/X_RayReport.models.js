@@ -22,6 +22,11 @@ const X_RayReportSchema=new Schema({
         type:mongoose.Types.ObjectId,
         ref:'Patient',
         required:true
+    },
+    prescription:{
+        type:mongoose.Types.ObjectId,
+        ref:'prescription',
+        required:true
     }
     },{
     timestamps:true
