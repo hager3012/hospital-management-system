@@ -85,12 +85,13 @@ export const searchMedicine=catchAsncError(async(req,res,next)=>{
 export const viewPatient=catchAsncError(async(req,res,next)=>{
   let arrayOfPatient=[];
   await prescription.find().populate('doctor','userId Specialization').then(async(data)=>{
+    console.log(data);
     for(let i=0;i<data.length;i++){
       if(data[i].Medication.length>0){
         await PatientBuyMedicine.findOne({Prescription:data[i]._id}).then(async(result)=>{
           if(!result){
             let doctor=await userModel.findById(data[i].doctor.userId)
-            await Patient.findById(data[i].Patient).populate('user','-password -role -Address -confirmEmail -__v').then((result)=>{
+            await Patient.findById(data[i].Patient).populate('user','-password -role -Address -confirmEmail -__v -forgetCode').then((result)=>{
               arrayOfPatient.push({NameOfDoctor:doctor.name,SpecializationDoctor:data[i].doctor.Specialization,prescriptionId:data[i]._id,user:result.user,Medication:data[i].Medication})
             })
           }

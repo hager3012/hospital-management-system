@@ -177,7 +177,7 @@ export const BookRoom=catchAsncError(async(req,res,next)=>{
   if(!patient){
     return next(new AppError('Patient Not Found',422))
   }
-  bookRoom.findOne({Room:roomID}).then(async(data)=>{
+  bookRoom.findOne({Patient:patient._id}).then(async(data)=>{
       if(data){
         return next(new AppError('Patient have room',406))
       }else{
@@ -239,7 +239,7 @@ export const viewBookRoom=catchAsncError(async(req,res,next)=>{
       return next(new AppError('Patient Not Found',422))
     }
     await bookRoom.findOne({Patient:data._id}).populate('Room').then((result)=>{
-      res.json({message:'success',Room:result.Room,status:200})
+      res.json({message:'success',Room:result,status:200})
     })
   })
   

@@ -113,7 +113,7 @@ export const addPrescription=catchAsncError(async(req,res,next)=>{
     }
     prescription.findOne({datePatient:datePatient,Patient:patientID}).then(async(data)=>{
         if(!data){
-            await prescription.insertMany({doctor:userID,Patient:patientID,Advice,Medication,Lab,X_ray,datePatient}).then(()=>{
+            await prescription.insertMany({doctor:doctor._id,Patient:patientID,Advice,Medication,Lab,X_ray,datePatient}).then(()=>{
                 res.json({message:'success',status:200})
             })
         }
@@ -125,7 +125,8 @@ export const addPrescription=catchAsncError(async(req,res,next)=>{
 })    
 export const viewPrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
-    await prescription.find({doctor:userID,Patient:patientID}).then((data)=>{
+    let doctor=await Doctor.findOne({userId:userID});
+    await prescription.find({doctor:doctor._id,Patient:patientID}).then((data)=>{
         if(!data){
             return next(new AppError('prescription is Not Found',406))
         }
@@ -135,7 +136,8 @@ export const viewPrescription=catchAsncError(async(req,res,next)=>{
 export const updatePrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
     let {Advice,Medication,Lab,X_ray,datePatient}=req.body;
-    await prescription.findOneAndUpdate({doctor:userID,Patient:patientID,datePatient},{Advice,Medication,Lab,X_ray},{new:true}).then((data)=>{
+    let doctor=await Doctor.findOne({userId:userID});
+    await prescription.findOneAndUpdate({doctor:doctor._id,Patient:patientID,datePatient},{Advice,Medication,Lab,X_ray},{new:true}).then((data)=>{
         if(!data){
             return next(new AppError('prescription is Not Found',406))
         }
