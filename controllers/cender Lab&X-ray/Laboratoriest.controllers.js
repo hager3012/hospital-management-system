@@ -127,7 +127,7 @@ export const viewPatient=catchAsncError(async(req,res,next)=>{
                       (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
                       result.user.DOB=age;
                      
-                  arrayOfPatientHaveReport.push({result,Lab:data[i].Lab})
+                  arrayOfPatientHaveReport.push({result,Lab:data[i].Lab,prescriptionID:data[i]._id})
                   
               })
           }
