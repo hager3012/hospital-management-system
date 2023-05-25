@@ -76,12 +76,12 @@ export const deleteX_RayReport=catchAsncError(async(req,res,next)=>{
     let reportID=req.query.reportID; 
     let currentPage=req.query.currentPage;
     let reportOne=await X_RayReport.findById(reportID)
-    if(reportOne){
         fs.unlink('uploads/' + reportOne.path, (err) => {
             if (err) {
                 throw err;
             }
         });
+        if(reportOne){
         await Patient.findById({_id:reportOne.Patient}).then(async(data)=>{
             await Order.findOne({user:data.user,checkOut:false}).then(async(result)=>{
                 let finalprice=result.finalPrice-reportOne.price;
@@ -110,7 +110,8 @@ export const deleteX_RayReport=catchAsncError(async(req,res,next)=>{
       
     }else{
       next(new AppError('Report is Not Found',422))
-    }
+    
+  }
 })
 ////////////////////////////////////////////////////////////////
 export const viewPatient=catchAsncError(async(req,res,next)=>{
@@ -118,7 +119,9 @@ export const viewPatient=catchAsncError(async(req,res,next)=>{
     await prescription.find().then(async(data)=>{
         for(let i=0;i<data.length;i++){
             if(data[i].X_ray.length){
-                await Patient.findById(data[i].Patient).populate('user','-_id name email Gender Mobile DOB').then((result)=>{
+                await Patient.findById(data[i].Patient).populate('user','name email Gender Mobile DOB').then(async(result)=>{
+                  await Order.findOne({user:result.user._id,checkOut:false}).then((orderData)=>{
+                    if(orderData){
                     let birthdate = new Date(result.user.DOB);
                     let today=new Date();
                         let age = today.getFullYear() - birthdate.getFullYear() - 
@@ -126,6 +129,8 @@ export const viewPatient=catchAsncError(async(req,res,next)=>{
                         (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
                         result.user.DOB=age;
                         arrayOfPatientHaveReport.push({result,X_Ray:data[i].X_ray,prescriptionID:data[i]._id}) 
+                    }
+                  })
                 }) 
             }
         }

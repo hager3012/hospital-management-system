@@ -16,6 +16,7 @@ import { catchAsncError } from "../../util/catchAsncError.js";
 import { bookRoom } from './../../models/rooms/bookRoom.models.js';
 import { LabReport } from "../../models/CenterLab&radio/lab/LabReport.models.js";
 import { X_RayReport } from "../../models/CenterLab&radio/X-ray/X_RayReport.models.js";
+import { reportForPatient } from "../../models/Nurse/reportForPatient.models.js";
 
 export const searchDoctor=catchAsncError( async(req,res,next)=> {
      await  Doctor.find({confirmTiming:"true"},{__v:0,createdAt:0,updatedAt:0,Salary:0}).populate('userId','name email Gender').populate({path:'Times'  }).then((response=>{
@@ -48,45 +49,55 @@ export const BookDoctor=catchAsncError( async(req,res,next)=> {
   if(!findDoctor){
     return next(new AppError('Doctor is Not Found',422))
   }
-  let num=await appointment.find({Doctor:doctorID,Date:DateAPI}).count();
-    let limit=await bookingTime.findOne({doctor:doctorID});
-    if(num===limit.limitRange){
-      next(new AppError('Limit Range Completed Please Book another Time',422))
+  let patient =await Patient.findOne({user:userID});
+  await appointment.findOne({Patient:patient._id,Doctor:doctorID,Date:DateAPI}).then(async(appointmentData)=>{
+    if(appointmentData){
+      return next(new AppError('you Book doctor',422))
     }
-    else{  
-      let patient =await Patient.findOne({user:userID});
-      await appointment.insertMany({Patient:patient._id,Doctor:doctorID,Date:DateAPI});
-      await Order.findOne({user:userID,checkOut:false}).then(async(data)=>{
-        let arrayOfproduct=[];
-        let finalprice=0;
-        if(!data){
-          arrayOfproduct.push({name:'BookDoctor'+findDoctor.Specialization,
-          Price:50
-        })
-          await Order.insertMany({user:userID,products:arrayOfproduct,finalPrice:50})
-        }
-        else{
-          arrayOfproduct=data.products;
-          arrayOfproduct.push({name:'BookDoctor'+findDoctor.Specialization,
-          Price:50})
-          finalprice=data.finalPrice+50;
-          await Order.updateOne({user:userID,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
-        }
+    else{
+      let num=await appointment.find({Doctor:doctorID,Date:DateAPI}).count();
+      let limit=await bookingTime.findOne({doctor:doctorID});
+      if(num===limit.limitRange){
+        next(new AppError('Limit Range Completed Please Book another Time',422))
+      }
+      else{  
         
-      })
-      res.json({message:'success',status:200});
+        await appointment.insertMany({Patient:patient._id,Doctor:doctorID,Date:DateAPI});
+        await Order.findOne({user:userID,checkOut:false}).then(async(data)=>{
+          let arrayOfproduct=[];
+          let finalprice=0;
+          if(!data){
+            arrayOfproduct.push({name:'BookDoctor'+findDoctor.Specialization,
+            Price:50
+          })
+            await Order.insertMany({user:userID,products:arrayOfproduct,finalPrice:50})
+          }
+          else{
+            arrayOfproduct=data.products;
+            arrayOfproduct.push({name:'BookDoctor'+findDoctor.Specialization,
+            Price:50})
+            finalprice=data.finalPrice+50;
+            await Order.updateOne({user:userID,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
+          }
+          
+        })
+        res.json({message:'success',status:200});
+      }
     }
+  })
+  
 }) 
 ///////////////////////////////////////////////////////
-export const cancelBookDoctor=catchAsncError(async(req,res,next)=>{
+export const cancelBookDoctor=catchAsncError(async(req,res,next)=>{  
   let {idAppointment}=req.query;
   await appointment.findOneAndDelete(({_id:idAppointment})).then(async(data)=>{
     if(data){
+      let findDoctor=await Doctor.findById(data.Doctor);
       await Order.findOne({user:req.userid,checkOut:false}).then(async(result)=>{
         let finalprice=result.finalPrice-50;
         let arrayOfproduct=result.products;
         for(let i=0;i<arrayOfproduct.length;i++){
-          if(arrayOfproduct[i].name==='BookDoctor'){
+          if(arrayOfproduct[i].name==='BookDoctor'+findDoctor.Specialization){
             arrayOfproduct.splice(i,1)
           }
         }
@@ -188,15 +199,15 @@ export const BookRoom=catchAsncError(async(req,res,next)=>{
               let finalprice=0;
               if(!result){
                 arrayOfproduct.push({name:'Book Room',
-                Price:data.price
+                Price:Number(data.price)
               })
-                await Order.insertMany({user:userID,products:arrayOfproduct,finalPrice:data.price})
+                await Order.insertMany({user:userID,products:arrayOfproduct,finalPrice:Number(data.price)})
               }
               else{
                 arrayOfproduct=result.products;
                 arrayOfproduct.push({name:'Book Room',
                 Price:data.price})
-                finalprice=result.finalPrice+data.price;
+                finalprice=result.finalPrice+Number(data.price);
                 await Order.updateOne({user:userID,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
               }
               
@@ -215,21 +226,29 @@ export const cancelRoom=catchAsncError(async(req,res,next)=>{
   if(!patient){
     return next(new AppError('Patient Not Found',422))
   }
-  await bookRoom.deleteOne({Patient:patient._id,Room:roomID})
+  await bookRoom.findOne({Room:roomID}).then(async(dataRoom)=>{
+    if(!dataRoom){
+      return next(new AppError('You cancel room',422))
+    }
+    else{
+      await bookRoom.deleteOne({Patient:patient._id,Room:roomID})
       
-    await Room.findByIdAndUpdate(roomID,{status:"false"}).then(async(data)=>{
-      await Order.findOne({user:req.userid,checkOut:false}).then(async(result)=>{
-        let finalprice=result.finalPrice-data.price;
-        let arrayOfproduct=result.products;
-        for(let i=0;i<arrayOfproduct.length;i++){
-          if(arrayOfproduct[i].name==='Book Room'){
-            arrayOfproduct.splice(i,1)
+      await Room.findByIdAndUpdate(dataRoom.Room,{status:"false"}).then(async(data)=>{
+        await Order.findOne({user:userID,checkOut:false}).then(async(result)=>{
+          let finalprice=Math.abs(result.finalPrice-Number(data.price));
+          let arrayOfproduct=result.products;
+          for(let i=0;i<arrayOfproduct.length;i++){
+            if(arrayOfproduct[i].name==='Book Room'){
+              arrayOfproduct.splice(i,1)
+            }
           }
-        }
-      await Order.updateOne({user:req.userid,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice}) 
-    });
-    res.json({message:'success',status:200})
+        await Order.updateOne({user:userID,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice}) 
+      });
+      res.json({message:'success',status:200})
+    })
+    }
   })
+  
 })
 ///////////////////////////////////////////////////////////////
 export const viewBookRoom=catchAsncError(async(req,res,next)=>{
@@ -346,10 +365,28 @@ export const payPatientBill=catchAsncError(async(req,res,next)=>{
   // Handle the event
   let {orderId}=event.data.object.metadata
   if (event.type =='checkout.session.completed') {
-    await Order.findByIdAndUpdate(orderId,{checkOut:true,paymentType:"card"});
-    res.json({message:'success',status:200})
+    let order=await Order.findByIdAndUpdate(orderId,{checkOut:true,paymentType:"card"});
+    res.json({message:'success',status:200});
+    await Patient.findOne({user:order.user}).then(async(patientData)=>{
+      await bookRoom.deleteOne({Patient:patientData._id})
+    })
   }
   else{
     res.json({message:'Rejected',status:400})
   }
+})
+//////////////////////////////////////////////////////////////////////////
+export const viewReport=catchAsncError(async(req,res,next)=>{
+  await Patient.findOne({user:req.userid}).populate('user','name Gender DOB').then(async(data)=>{
+    if(!data){
+        return next(new AppError('Patient is Not Found',426))
+    }
+    await reportForPatient.findOne({Patient:data._id},{__v:0,updatedAt:0,createdAt:0,Patient:0}).populate('Nurse','name Gender ').then(async(result)=>{
+        if(!result){
+            return next(new AppError('You can Add report For this Patient',426))
+        }
+            res.json({message:'success',result,status:200}) ;
+    })
+    
+})
 })

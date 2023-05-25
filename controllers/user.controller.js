@@ -50,7 +50,35 @@ export const verifiy =catchAsncError(async(req,res,next)=>{
         }
         else{
         await userModel.findOneAndUpdate({email:decoded.options},{confirmEmail:true});
-        res.json({message:'success',status:200});
+        res.send(`<!DOCTYPE html>
+        <html>
+        
+        <head>
+          <meta charset="utf-8" />
+          <title></title>
+          <style>
+            * {
+              box-sizing: border-box;
+            }
+          </style>
+        </head>
+        
+        <body style="background-color: #f4f4f4; font-family: Roboto, arial, sans-serif">
+          <div style="background-color: #35b8e8; height: 140px;">
+          </div>
+          <div style="max-width: 550px; background-color: white; margin: -80px auto 0 auto; padding: 20px 60px 80px 60px;">
+            <div style="  font-size: 50px; font-weight: 300; margin-top: 20px; text-align: center;"> Email Confirmed!</div>
+            <br />
+            <p style="font-size: 20px;">Congratulations! Your email has been confirmed and your account is ready. Please close this page and go back to  login.</p>
+            <div class=" box-sizing: border-box; width: 100%;">
+              <br />
+              <br />
+        
+            </div>
+          </div>
+        </body>
+        
+        </html>`)
         }
     });
     

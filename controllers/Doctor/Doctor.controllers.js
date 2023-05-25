@@ -12,6 +12,8 @@ import { Patient } from './../../models/Patient/Patient.models.js';
 import { bookRoom } from './../../models/rooms/bookRoom.models.js';
 import { LabReport } from './../../models/CenterLab&radio/lab/LabReport.models.js';
 import { X_RayReport } from './../../models/CenterLab&radio/X-ray/X_RayReport.models.js';
+import { Order } from "../../models/Patient/order.models.js";
+import { reportForPatient } from "../../models/Nurse/reportForPatient.models.js";
 
 export const confirmTiming =catchAsncError(async(req,res,next)=>{
     let DoctorId=req.query.userID;
@@ -68,41 +70,64 @@ export const ViewAppointment=catchAsncError( async(req,res,next)=> {
     }
     let time=await appointment.find({Doctor:DoctorFind._id},{__v:0,createdAt:0,updatedAt:0,Doctor:0}).then(async(data)=>{
         for(let i=0;i<data.length;i++){
-            let patient=await Patient.findById(data[i].Patient,{__v:0,createdAt:0,updatedAt:0, _id:0}).populate('user','name DOB -_id');
-            Time.push({Appointment:data[i],Patient:patient.user});
-            ////// Prescription For Patient
-            let PrescriptionForPatient=await prescription.findOne({Patient:data[i].Patient});
-            if(PrescriptionForPatient){
-                Time[i].Prescription=true;
-            }else{
-                Time[i].Prescription=false;
-            }
-            // medical History For Patient
-            let medicalHistoryForPatient=medicalHistory.findOne({Patient:data[i].Patient});
-            if(medicalHistoryForPatient){
-                Time[i].medicalHistory=true;
-            }else{
-                Time[i].medicalHistory=false;
-            }
-            ///////// Lab report 
-            let LabReportForPatien=LabReport.findOne({Patient:data[i].Patient});
-            if(LabReportForPatien){
-                Time[i].LabReport=true;
-            }else{
-                Time[i].LabReport=false;
-            }
-            ///////////// X-Ray Report
-            let X_RayReortForPatient=X_RayReport.findOne({Patient:data[i].Patient});
-            if(X_RayReortForPatient){
-                Time[i].X_RayReport=true;
-            }else{
-                Time[i].X_RayReport=false;
-            }
+            let patient=await Patient.findById(data[i].Patient,{__v:0,createdAt:0,updatedAt:0, _id:0}).populate('user','name DOB ').then(async(patientData)=>{
+                await Order.findOne({user:patientData.user._id,checkOut:false}).then(async(orderData)=>{
+                    if(orderData){
+                        Time.push({Appointment:data[i],Patient:patientData.user});
+                        ////// Prescription For Patient
+                        await prescription.findOne({Patient:data[i].Patient}).then((PrescriptionForPatient)=>{
+                            if(PrescriptionForPatient){
+                                Time[i].Prescription=true;
+                            }else{
+                                Time[i].Prescription=false;
+                            }
+                        })
+                        
+                        // medical History For Patient
+                        await medicalHistory.findOne({Patient:data[i].Patient}).then((medicalHistoryForPatient)=>{
+                            if(medicalHistoryForPatient){
+                                Time[i].medicalHistory=true;
+                            }else{
+                                Time[i].medicalHistory=false;
+                            }
+                        })
+                        
+                        ///////// Lab report 
+                        await LabReport.findOne({Patient:data[i].Patient}).then((LabReportForPatien)=>{
+                            if(LabReportForPatien){
+                                Time[i].LabReport=true;
+                            }else{
+                                Time[i].LabReport=false;
+                            }
+                        })
+                        
+                        ///////////// X-Ray Report
+                        await X_RayReport.findOne({Patient:data[i].Patient}).then((X_RayReortForPatientData)=>{
+                            if(X_RayReortForPatientData){
+                                Time[i].X_RayReport=true;
+                            }else{
+                                Time[i].X_RayReport=false;
+                            }
+                        })
+                        
+                        ////////////////// patient report 
+                        await reportForPatient.findOne({Patient:data[i].Patient}).then((reportData)=>{
+                            if(reportData){
+                                Time[i].PatientReport=true;
+                            }else{
+                                Time[i].PatientReport=false;
+                            }
+                        })
+                    }
+                })
+            })
+            
         }
         
     })
     res.json({message:'success',Data:Time,status:200})
     }) 
+//////////////////////////////////////////////////////////
 export const addPrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
     let {Advice,Medication,Lab,X_ray,datePatient}=req.body;
@@ -123,16 +148,18 @@ export const addPrescription=catchAsncError(async(req,res,next)=>{
     })
 
 })    
+///////////////////////////////////////////////////////////////////
 export const viewPrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
     let doctor=await Doctor.findOne({userId:userID});
-    await prescription.find({doctor:doctor._id,Patient:patientID}).then((data)=>{
+    await prescription.find({doctor:doctor._id,Patient:patientID}).then(async(data)=>{
         if(!data){
             return next(new AppError('prescription is Not Found',406))
         }
         res.json({message:'success',data,status:200})
     });
 })
+///////////////////////////////////////////////////////
 export const updatePrescription=catchAsncError(async(req,res,next)=>{
     let {userID,patientID}=req.query;
     let {Advice,Medication,Lab,X_ray,datePatient}=req.body;
@@ -144,6 +171,7 @@ export const updatePrescription=catchAsncError(async(req,res,next)=>{
         res.json({message:'success',data,status:200})
     });
 })
+///////////////////////////////////////////////////////////
 export const addPatientDisease=catchAsncError(async(req,res,next)=>{
     let patientID=req.query.patientID;
     let {disease}=req.body;

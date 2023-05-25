@@ -90,8 +90,12 @@ export const viewPatient=catchAsncError(async(req,res,next)=>{
         await PatientBuyMedicine.findOne({Prescription:data[i]._id}).then(async(result)=>{
           if(!result){
             let doctor=await userModel.findById(data[i].doctor.userId)
-            await Patient.findById(data[i].Patient).populate('user','-password -role -Address -confirmEmail -__v -forgetCode').then((result)=>{
-              arrayOfPatient.push({NameOfDoctor:doctor.name,SpecializationDoctor:data[i].doctor.Specialization,prescriptionId:data[i]._id,user:result.user,Medication:data[i].Medication})
+            await Patient.findById(data[i].Patient).populate('user','-password -role -Address -confirmEmail -__v -forgetCode').then(async(result)=>{
+              await Order.findOne({user:result.user._id,checkOut:false}).then((orderData)=>{
+                if(orderData){
+              arrayOfPatient.push({NameOfDoctor:doctor.name,SpecializationDoctor:data[i].doctor.Specialization,prescriptionId:data[i]._id,user:result.user,Medication:data[i].Medication,PatientId:data[i].Patient})
+                }
+              })
             })
           }
         })
@@ -105,29 +109,29 @@ export const buyMedicine=catchAsncError(async(req,res,next)=>{
   let patientId=req.query.patientId;
   let {nameMedicine,quantity}=req.body;
   let medicine=await Medicine.findOne({Medicine_name:nameMedicine});
-  let user=await Patient.findOne({user:patientId});
-  await Order.findOne({user:user._id,checkOut:false}).then(async(result)=>{
+  let user=await Patient.findById(patientId);
+  await Order.findOne({user:user.user,checkOut:false}).then(async(result)=>{
     let arrayOfproduct=[];
     let finalprice=0;
     if(!result){
       arrayOfproduct.push({name:'Buy medicine '+nameMedicine,
       Price:medicine.Medicine_price,
-      quantity:quantity
+      quantity:Number(quantity)
     })
-      await Order.insertMany({user:user._id,products:arrayOfproduct,finalPrice:medicine.Medicine_price*quantity})
+      await Order.insertMany({user:user.user,products:arrayOfproduct,finalPrice:medicine.Medicine_price*Number(quantity)})
     }
     else{
       arrayOfproduct=result.products;
       arrayOfproduct.push({name:'Buy medicine '+nameMedicine,
       Price:medicine.Medicine_price,
-      quantity:quantity
+      quantity:Number(quantity)
     })
       finalprice=result.finalPrice+medicine.Medicine_price*quantity;
-      await Order.updateOne({user:user._id,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
+      await Order.updateOne({user:user.user,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
     }
     
   })
-  await Medicine.updateOne({Medicine_name:nameMedicine},{$inc: { Medicine_quantity: -quantity }}).then(()=>{
+  await Medicine.updateOne({Medicine_name:nameMedicine},{$inc: { Medicine_quantity: -Number(quantity) }}).then(()=>{
     res.json({message:'success',status:200}) ;
   })
 });

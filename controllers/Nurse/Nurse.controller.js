@@ -89,9 +89,6 @@ export const viewMedication=catchAsncError(async(req,res,next)=>{
             return next(new AppError('this patient Not have prescription',426))
         }
         for(let i=0;i<data.length;i++){
-            data[i].Medication.map(item=>{
-                item.times="every "+24/item.times +" hours"
-            })
             let user=await userModel.findById(data[i].Patient.user,{name:1});
             let doctorc=await userModel.findById(data[i].doctor.userId,{name:1})
             data[i].Patient=user

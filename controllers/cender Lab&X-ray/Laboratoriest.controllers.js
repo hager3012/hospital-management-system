@@ -33,7 +33,7 @@ export const addLapReport=catchAsncError(async(req,res,next)=>{
                           arrayOfproduct=result.products;
                           arrayOfproduct.push({name:'Lab Report',
                           Price:Number(price)})
-                          finalprice=result.finalPrice+Number(price);
+                          finalprice=Number(result.finalPrice)+Number(price);
                           await Order.updateOne({user:data.user,checkOut:false},{products:arrayOfproduct,finalPrice:finalprice})
                         }
                         
@@ -77,11 +77,6 @@ export const deleteReport=catchAsncError(async(req,res,next)=>{
     let currentPage=req.query.currentPage;
     let reportOne=await LabReport.findById(reportID)
     if(reportOne){
-        fs.unlink('uploads/' + reportOne.path, (err) => {
-            if (err) {
-                throw err;
-            }
-        });
         await Patient.findById({_id:reportOne.Patient}).then(async(data)=>{
             await Order.findOne({user:data.user,checkOut:false}).then(async(result)=>{
                 let finalprice=result.finalPrice-reportOne.price;
@@ -115,20 +110,21 @@ export const deleteReport=catchAsncError(async(req,res,next)=>{
 ///////////////////////////////////////////////////////////////////////
 export const viewPatient=catchAsncError(async(req,res,next)=>{
   let arrayOfPatientHaveReport=[];
-  
   await prescription.find().then(async(data)=>{
       for(let i=0;i<data.length;i++){
           if(data[i].Lab.length){
-              await Patient.findById(data[i].Patient).populate('user','-_id name email Gender Mobile DOB').then((result)=>{
-                  let birthdate = new Date(result.user.DOB);
-                  let today=new Date();
-                      let age = today.getFullYear() - birthdate.getFullYear() - 
-                      (today.getMonth() < birthdate.getMonth() || 
-                      (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
-                      result.user.DOB=age;
-                     
-                  arrayOfPatientHaveReport.push({result,Lab:data[i].Lab,prescriptionID:data[i]._id})
-                  
+              await Patient.findById(data[i].Patient).populate('user',' name email Gender Mobile DOB').then(async(result)=>{
+                await Order.findOne({user:result.user._id,checkOut:false}).then((orderData)=>{
+                  if(orderData){
+                    let birthdate = new Date(result.user.DOB);
+                    let today=new Date();
+                        let age = today.getFullYear() - birthdate.getFullYear() - 
+                        (today.getMonth() < birthdate.getMonth() || 
+                        (today.getMonth() === birthdate.getMonth() && today.getDate() < birthdate.getDate()));
+                        result.user.DOB=age;
+                    arrayOfPatientHaveReport.push({result,Lab:data[i].Lab,prescriptionID:data[i]._id})
+                  }
+                })
               })
           }
       }
