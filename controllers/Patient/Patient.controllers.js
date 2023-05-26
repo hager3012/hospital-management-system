@@ -367,7 +367,7 @@ export const payPatientBill=catchAsncError(async(req,res,next)=>{
   if (event.type =='checkout.session.completed') {
     let order=await Order.findByIdAndUpdate(orderId,{checkOut:true,paymentType:"card"});
     // let patientData=await Patient.findOne({user:order.user});
-    res.json({message:'success',order,status:200});
+    res.json({message:'success',status:200});
   }
   else{
     res.json({message:'Rejected',status:400})
