@@ -365,10 +365,13 @@ export const payPatientBill=catchAsncError(async(req,res,next)=>{
   // Handle the event
   let {orderId}=event.data.object.metadata
   if (event.type =='checkout.session.completed') {
-    await Order.findByIdAndUpdate(orderId,{checkOut:true,paymentType:"card"},{new:true}).then(async(order)=>{
+    await Order.findByIdAndUpdate(orderId,{checkOut:true,paymentType:"card"}).then(async(orderData)=>{
       res.json({message:'success',status:200});
-    await Patient.findOne({user:order.user}).then(async(patientData)=>{
+      console.log(orderData);
+    await Patient.findOne({user:orderData.user}).then(async(patientData)=>{
+      console.log(patientData);
       await bookRoom.findOneAndDelete({Patient:patientData._id}).then(async(bookRoomData)=>{
+        console.log(bookRoomData);
        await Room.findByIdAndUpdate(bookRoomData.Room,{status:'false'})
       })
     })
