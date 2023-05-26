@@ -3,6 +3,7 @@ import express from 'express';
 import { auth as _auth } from '../Middleware/user.auth.js';
 import {  authorPatient } from '../Middleware/author.js';
 import { BookDoctor, BookRoom, ViewAppointment, ViewDoctors, cancelBookDoctor, cancelRoom, createOrder, patientInformation, payPatientBill, searchDoctor, timeDetails, viewBookRoom, viewDisease, viewLabReport, viewMedicalHistory, viewPrescription, viewReport, viewRoom, viewX_RayReport } from '../controllers/Patient/Patient.controllers.js';
+import { finshBay } from '../Middleware/paymentCard.js';
 const PatientRouter =Router();
 PatientRouter.get('/ViewDoctors',_auth,authorPatient,ViewDoctors)
 PatientRouter.get('/searchDoctor',_auth,authorPatient,searchDoctor)
@@ -21,6 +22,6 @@ PatientRouter.get('/viewDisease',_auth,authorPatient,viewDisease);
 PatientRouter.get('/createOrder',_auth,authorPatient,createOrder);
 PatientRouter.get('/viewLabReport',_auth,authorPatient,viewLabReport);
 PatientRouter.get('/viewX_RayReport',_auth,authorPatient,viewX_RayReport);
-PatientRouter.post('/webhook', express.raw({type: 'application/json'}), payPatientBill);
+PatientRouter.post('/webhook', express.raw({type: 'application/json'}), payPatientBill,finshBay);
 PatientRouter.get('/viewReport',_auth,authorPatient,viewReport)
 export default PatientRouter;   

@@ -366,6 +366,8 @@ export const payPatientBill=catchAsncError(async(req,res,next)=>{
   let orderId=event.data.object.metadata.orderId
   if (event.type =='checkout.session.completed') {
     let order=await Order.findByIdAndUpdate(orderId,{checkOut:true,paymentType:"card"});
+    req.orderID=orderId
+    next();
     res.json({message:'success',orderId,status:200});
   }
   else{
