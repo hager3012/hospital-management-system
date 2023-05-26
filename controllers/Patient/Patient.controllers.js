@@ -368,7 +368,8 @@ export const payPatientBill=catchAsncError(async(req,res,next)=>{
     let order=await Order.findByIdAndUpdate(orderId,{checkOut:true,paymentType:"card"});
     let patientData=await Patient.findOne({user:order.user});
     let BookRoomData=await bookRoom.findOneAndDelete({Patient:patientData._id});
-    res.json({message:'success',BookRoomData,status:200});
+    let roomData=await Room.findByIdAndUpdate(BookRoomData.Room,{status:"false"});
+    res.json({message:'success',roomData,status:200});
   }
   else{
     res.json({message:'Rejected',status:400})
