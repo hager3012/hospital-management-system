@@ -122,12 +122,16 @@ export const ViewAppointment=catchAsncError( async(req,res,next)=> {
   let time=await appointment.find({Patient:patient._id},{__v:0,createdAt:0,updatedAt:0,Patient:0}).then(async(data)=>{
     for(let i=0;i<data.length;i++){
       let result=await Doctor.findById(data[i].Doctor,{Experience:0,Language:0,Times:0,Salary:0,__v:0,createdAt:0,updatedAt:0}).populate('userId','name Specialization -_id');
+      let findPrescription=await prescription.findOne({Patient:patient._id,datePatient:data[i].Date});
       if(result){
-        doctor.push({user:result,Time:data[i]});
+        if(findPrescription){
+          doctor.push({user:result,Time:data[i],findPrescription:true});
+        }else{
+          doctor.push({user:result,Time:data[i],findPrescription:false});
+        }
+        
       }
-
     }
-
   })
   res.json({message:'success',Doctor:doctor,status:200})
   }) 

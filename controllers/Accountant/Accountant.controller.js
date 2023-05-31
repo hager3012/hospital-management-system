@@ -12,15 +12,31 @@ export const viewOrderForPatient=catchAsncError(async(req,res,next)=>{
 })
 /////////////////////////////////////////////////////////////////////////
 export const viewPatientNotPay=catchAsncError(async(req,res,next)=>{
-    await Order.find({checkOut:false}).populate('user','name email Gender').then((data)=>{
-        res.json({message:'success',data,status:200})
-    })
+    const {currentPage} = req.query || 1;
+    const perPage = 10;
+    let totalItems;
+    let Patient=  await Order.find({checkOut:false}).countDocuments()
+    .then(count => {
+      totalItems = count;
+      return Order.find({checkOut:false}).populate('user','name email Gender')
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+    });
+    res.json({message:'success',Patients:Patient,status:200,totalItems: totalItems})
 });
 /////////////////////////////////////////////////////////////////////////
 export const viewPatientPay=catchAsncError(async(req,res,next)=>{
-    await Order.find({checkOut:true}).populate('user','name email Gender').then((data)=>{
-        res.json({message:'success',data,status:200})
-    })
+    const {currentPage} = req.query || 1;
+    const perPage = 10;
+    let totalItems;
+    let Patient=  await Order.find({checkOut:true}).countDocuments()
+    .then(count => {
+      totalItems = count;
+      return Order.find({checkOut:true}).populate('user','name email Gender')
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+    });
+    res.json({message:'success',Patients:Patient,status:200,totalItems: totalItems})
 });
 /////////////////////////////////////////////////////////////////////////
 export const payPatientBill=catchAsncError(async(req,res,next)=>{
